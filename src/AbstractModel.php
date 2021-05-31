@@ -104,7 +104,10 @@ abstract class AbstractModel implements ModelInterface
 
     public function getError(string $attribute): array
     {
-        return $this->attributesErrors[$attribute] ?? [];
+        return
+            isset($this->attributesErrors[$attribute])
+                ? $this->attributesErrors[$attribute]
+                : [];
     }
 
     public function getErrors(): array
@@ -194,16 +197,16 @@ abstract class AbstractModel implements ModelInterface
         if (isset($this->attributes[$realName])) {
             switch ($this->attributes[$realName]) {
                 case 'bool':
-                    $this->writeAttribute($name, (bool) $value);
+                    $this->writeAttribute($name, $value);
                     break;
                 case 'float':
-                    $this->writeAttribute($name, (float) $value);
+                    $this->writeAttribute($name, $value);
                     break;
                 case 'int':
-                    $this->writeAttribute($name, (int) $value);
+                    $this->writeAttribute($name, $value);
                     break;
                 case 'string':
-                    $this->writeAttribute($name, (string) $value);
+                    $this->writeAttribute($name, $value);
                     break;
                 default:
                     $this->writeAttribute($name, $value);
@@ -296,7 +299,7 @@ abstract class AbstractModel implements ModelInterface
             return [$attribute, null];
         }
 
-        [$attribute, $nested] = explode('.', $attribute, 2);
+        [$attribute, $nested] = explode('.', $attribute);
 
         /** @var object */
         $attributeNested = $this->attributes[$attribute];
