@@ -8,10 +8,10 @@
 
 [![Total Downloads](https://poser.pugx.org/yii-extension/simple-model/downloads.png)](https://packagist.org/packages/yii-extension/simple-model)
 [![Build Status](https://github.com/yii-extension/simple-model/workflows/build/badge.svg)](https://github.com/yii-extension/simple-model/actions?query=workflow%3Abuild)
-[![codecov](https://codecov.io/gh/yii-extension/simple-model/branch/main/graph/badge.svg?token=WQI25yo4d3)](https://codecov.io/gh/yii-extension/simple-model)
+[![codecov](https://codecov.io/gh/yii-extension/simple-model/branch/master/graph/badge.svg?token=WQI25yo4d3)](https://codecov.io/gh/yii-extension/simple-model)
 [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https://badge-api.stryker-mutator.io/github.com/yii-extension/simple-model/master)](https://dashboard.stryker-mutator.io/reports/github.com/yii-extension/simple-model/master)
 [![static analysis](https://github.com/yii-extension/simple-model/workflows/static%20analysis/badge.svg)](https://github.com/yii-extension/simple-model/actions?query=workflow%3A%22static+analysis%22)
-
+[![type-coverage](https://shepherd.dev/github/yii-extension/simple-model/coverage.svg)](https://shepherd.dev/github/yii-extension/simple-model)
 
 ## Installation
 

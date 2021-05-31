@@ -123,6 +123,9 @@ final class ModelTest extends TestCase
     {
         $model = new ModelStub();
         $this->assertEmpty($model->getErrors());
+
+        $model->addError('public', 'Public error');
+        $this->assertSame(['Public error'], $model->getError('public'));
     }
 
     public function testGetFirstError(): void
