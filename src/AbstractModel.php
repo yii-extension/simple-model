@@ -26,7 +26,7 @@ use function strpos;
 abstract class AbstractModel implements ModelInterface
 {
     private array $attributes;
-    /** @var array<string, array<int|string, string>> */
+    /** @var array<string, array<array-key, string>> */
     private array $attributesErrors = [];
     private Inflector $inflector;
 
@@ -215,7 +215,7 @@ abstract class AbstractModel implements ModelInterface
     private function addErrors(array $items): void
     {
         /**
-         * @var array<string, array<int|string, string>> $items
+         * @var array<string, array<array-key, string>> $items
          */
         foreach ($items as $attribute => $errors) {
             foreach ($errors as $error) {
