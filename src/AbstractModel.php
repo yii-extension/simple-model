@@ -26,7 +26,7 @@ use function strpos;
 abstract class AbstractModel implements ModelInterface
 {
     private array $attributes;
-    /** @var array<string,array> */
+    /** @var array<string, array<int|string, string>> */
     private array $attributesErrors = [];
     private Inflector $inflector;
 
@@ -43,16 +43,18 @@ abstract class AbstractModel implements ModelInterface
 
     public function getAttributeHint(string $attribute): string
     {
-        [$attribute, $nested] = $this->getNestedAttribute($attribute);
-
-        if ($nested !== null) {
-            return (string) $this->getAttributeValue($attribute)->getAttributeHint($nested);
-        }
-
         $attributeHints = $this->getAttributeHints();
 
         /** @var string */
         $hint = $attributeHints[$attribute] ?? '';
+
+        [$attribute, $nested] = $this->getNestedAttribute($attribute);
+
+        if ($nested !== null) {
+            /** @var ModelInterface */
+            $attributeNestedValue = $this->getAttributeValue($attribute);
+            $hint = $attributeNestedValue->getAttributeHint($nested);
+        }
 
         return $hint;
     }
@@ -64,15 +66,22 @@ abstract class AbstractModel implements ModelInterface
 
     public function getAttributeLabel(string $attribute): string
     {
+        $label = $this->generateAttributeLabel($attribute);
+
         if (array_key_exists($attribute, $this->getAttributeLabels())) {
-            return (string) $this->getAttributeLabels()[$attribute];
+            /** @var string */
+            $label = $this->getAttributeLabels()[$attribute];
         }
 
         [$attribute, $nested] = $this->getNestedAttribute($attribute);
 
-        return $nested !== null
-            ? (string) $this->getAttributeValue($attribute)->getAttributeLabel($nested)
-            : $this->generateAttributeLabel($attribute);
+        if ($nested !== null) {
+            /** @var ModelInterface */
+            $attributeNestedValue = $this->getAttributeValue($attribute);
+            $label = $attributeNestedValue->getAttributeLabel($nested);
+        }
+
+        return $label;
     }
 
     public function getAttributeLabels(): array
@@ -122,7 +131,7 @@ abstract class AbstractModel implements ModelInterface
             return '';
         }
 
-        return (string) reset($this->attributesErrors[$attribute]);
+        return reset($this->attributesErrors[$attribute]);
     }
 
     public function getFirstErrors(): array
@@ -135,7 +144,6 @@ abstract class AbstractModel implements ModelInterface
 
         foreach ($this->attributesErrors as $name => $es) {
             if (!empty($es)) {
-                /** @var string */
                 $errors[$name] = reset($es);
             }
         }
@@ -206,8 +214,10 @@ abstract class AbstractModel implements ModelInterface
 
     private function addErrors(array $items): void
     {
+        /**
+         * @var array<string, array<int|string, string>> $items
+         */
         foreach ($items as $attribute => $errors) {
-            /** @var string $error */
             foreach ($errors as $error) {
                 $this->attributesErrors[$attribute][] = $error;
             }
@@ -288,7 +298,10 @@ abstract class AbstractModel implements ModelInterface
 
         [$attribute, $nested] = explode('.', $attribute, 2);
 
-        if (!is_subclass_of($this->attributes[$attribute], ModelInterface::class)) {
+        /** @var object */
+        $attributeNested = $this->attributes[$attribute];
+
+        if (!is_subclass_of($attributeNested, ModelInterface::class)) {
             throw new InvalidArgumentException('Nested attribute can only be of ' . ModelInterface::class . ' type.');
         }
 
@@ -310,13 +323,14 @@ abstract class AbstractModel implements ModelInterface
             throw new InvalidArgumentException("Undefined property: \"$class::$attribute\".");
         }
 
+        /** @psalm-suppress MixedMethodCall */
         $getter = static fn (ModelInterface $class, string $attribute) => $nested === null
             ? $class->$attribute
             : $class->$attribute->getAttributeValue($nested);
 
         $getter = Closure::bind($getter, null, $this);
 
-        /** @psalm-suppress PossiblyInvalidFunctionCall */
+        /** @var Closure $getter */
         return $getter($this, $attribute);
     }
 
@@ -330,16 +344,17 @@ abstract class AbstractModel implements ModelInterface
     {
         [$attribute, $nested] = $this->getNestedAttribute($attribute);
 
-        /** @psalm-suppress MissingClosureParamType */
+        /**
+         * @psalm-suppress MissingClosureParamType
+         * @psalm-suppress MixedMethodCall
+         */
         $setter = static fn (ModelInterface $class, string $attribute, $value) => $nested === null
             ? $class->$attribute = $value
             : $class->$attribute->setAttribute($nested, $value);
 
         $setter = Closure::bind($setter, null, $this);
 
-        /**
-         * @var Closure $setter
-         */
+        /** @var Closure $setter */
         $setter($this, $attribute, $value);
     }
 }
