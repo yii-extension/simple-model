@@ -8,6 +8,7 @@ use Closure;
 use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionNamedType;
+use Stringable;
 use Yiisoft\Strings\Inflector;
 use Yiisoft\Strings\StringHelper;
 
@@ -90,7 +91,7 @@ abstract class AbstractModel implements ModelInterface
     }
 
     /**
-     * @return mixed
+     * @return null|scalar|Stringable
      */
     public function getAttributeValue(string $attribute)
     {
@@ -177,7 +178,7 @@ abstract class AbstractModel implements ModelInterface
 
         /**
          * @var string $name
-         * @var mixed $value
+         * @var null|scalar|Stringable $value
          */
         foreach ($values as $name => $value) {
             $this->setAttribute($name, $value);
@@ -187,8 +188,7 @@ abstract class AbstractModel implements ModelInterface
     }
 
     /**
-     * @param string $name
-     * @param mixed $value
+     * @param null|scalar|Stringable $value
      */
     public function setAttribute(string $name, $value): void
     {
@@ -312,8 +312,10 @@ abstract class AbstractModel implements ModelInterface
     }
 
     /**
-     * @return mixed
+     * @return null|scalar|Stringable
      *
+     * @psalm-suppress MixedReturnStatement
+     * @psalm-suppress MixedInferredReturnType
      * @psalm-suppress MissingClosureReturnType
      */
     private function readAttribute(string $attribute)
@@ -339,7 +341,7 @@ abstract class AbstractModel implements ModelInterface
 
     /**
      * @param string $attribute
-     * @param mixed $value
+     * @param null|scalar|Stringable $value
      *
      * @psalm-suppress MissingClosureReturnType
      */

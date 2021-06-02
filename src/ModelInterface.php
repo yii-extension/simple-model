@@ -4,37 +4,31 @@ declare(strict_types=1);
 
 namespace Yii\Extension\Simple\Model;
 
+use Stringable;
+
 /**
  * ModelInterface model represents an HTML form: its data, validation and presentation.
  */
 interface ModelInterface
 {
     /**
-     * Returns the attribute labels.
+     * Add error for the specified attribute.
      *
-     * Attribute labels are mainly used for display purpose. For example, given an attribute `firstName`, we can
-     * declare a label `First Name` which is more user-friendly and can be displayed to end users.
-     *
-     * By default an attribute label is generated automatically. This method allows you to
-     * explicitly specify attribute labels.
-     *
-     * Note, in order to inherit labels defined in the parent class, a child class needs to merge the parent labels
-     * with child labels using functions such as `array_merge()`.
-     *
-     * @return array attribute labels (name => label)
+     * @param string $attribute attribute name.
+     * @param string $error attribute error message.
      */
-    public function getAttributeLabels(): array;
+    public function addError(string $attribute, string $error): void;
 
     /**
-     * Returns the text label for the specified attribute.
+     * Returns the text hint for the specified attribute.
      *
      * @param string $attribute the attribute name.
      *
-     * @return string the attribute label.
+     * @return string the attribute hint.
      *
-     * {@see getAttributeLabels()}
+     * {@see getAttributeHints()}
      */
-    public function getAttributeLabel(string $attribute): string;
+    public function getAttributeHint(string $attribute): string;
 
     /**
      * Returns the attribute hints.
@@ -53,23 +47,49 @@ interface ModelInterface
     public function getAttributeHints(): array;
 
     /**
-     * Returns the text hint for the specified attribute.
+     * Returns the text label for the specified attribute.
      *
      * @param string $attribute the attribute name.
      *
-     * @return string the attribute hint.
+     * @return string the attribute label.
      *
-     * {@see getAttributeHints()}
+     * {@see getAttributeLabels()}
      */
-    public function getAttributeHint(string $attribute): string;
+    public function getAttributeLabel(string $attribute): string;
 
     /**
-     * Add error for the specified attribute.
+     * Returns the attribute labels.
      *
-     * @param string $attribute attribute name.
-     * @param string $error attribute error message.
+     * Attribute labels are mainly used for display purpose. For example, given an attribute `firstName`, we can
+     * declare a label `First Name` which is more user-friendly and can be displayed to end users.
+     *
+     * By default an attribute label is generated automatically. This method allows you to
+     * explicitly specify attribute labels.
+     *
+     * Note, in order to inherit labels defined in the parent class, a child class needs to merge the parent labels
+     * with child labels using functions such as `array_merge()`.
+     *
+     * @return array attribute labels (name => label)
      */
-    public function addError(string $attribute, string $error): void;
+    public function getAttributeLabels(): array;
+
+    /**
+     * Returns the value for the specified attribute.
+     *
+     * @param string $attribute
+     *
+     * @return null|scalar|Stringable
+     */
+    public function getAttributeValue(string $attribute);
+
+    /**
+     * Returns the errors for single attribute.
+     *
+     * @param string $attribute attribute name. Use null to retrieve errors for all attributes.
+     *
+     * @return array
+     */
+    public function getError(string $attribute): array;
 
     /**
      * Returns the errors for all attributes.
@@ -96,15 +116,6 @@ interface ModelInterface
     public function getErrors(): array;
 
     /**
-     * Returns the errors for single attribute.
-     *
-     * @param string $attribute attribute name. Use null to retrieve errors for all attributes.
-     *
-     * @return array
-     */
-    public function getError(string $attribute): array;
-
-    /**
      * Returns the errors for all attributes as a one-dimensional array.
      *
      * @param bool $showAllErrors boolean, if set to true every error message for each attribute will be shown otherwise
@@ -118,13 +129,16 @@ interface ModelInterface
     public function getErrorSummary(bool $showAllErrors): array;
 
     /**
-     * Returns a value indicating whether there is any validation error.
+     * Returns the first error of the specified attribute.
      *
-     * @param string|null $attribute attribute name. Use null to check all attributes.
+     * @param string $attribute attribute name.
      *
-     * @return bool whether there is any error.
+     * @return string the error message. Empty string is returned if there is no error.
+     *
+     * {@see getErrors()}
+     * {@see getFirstErrors()}
      */
-    public function hasErrors(?string $attribute = null): bool;
+    public function getFirstError(string $attribute): string;
 
     /**
      * Returns the first error of every attribute in the model.
@@ -136,18 +150,6 @@ interface ModelInterface
      * {@see getFirstError()}
      */
     public function getFirstErrors(): array;
-
-    /**
-     * Returns the first error of the specified attribute.
-     *
-     * @param string $attribute attribute name.
-     *
-     * @return string the error message. Empty string is returned if there is no error.
-     *
-     * {@see getErrors()}
-     * {@see getFirstErrors()}
-     */
-    public function getFirstError(string $attribute): string;
 
     /**
      * Returns the form name that this model class should use.
@@ -168,6 +170,15 @@ interface ModelInterface
      * {@see load()}
      */
     public function getFormName(): string;
+
+    /**
+     * Returns a value indicating whether there is any validation error.
+     *
+     * @param string|null $attribute attribute name. Use null to check all attributes.
+     *
+     * @return bool whether there is any error.
+     */
+    public function hasErrors(?string $attribute = null): bool;
 
     /**
      * Populates the model with input data.
@@ -191,4 +202,9 @@ interface ModelInterface
      * @return bool whether `load()` found the expected form in `$data`.
      */
     public function load(array $data): bool;
+
+    /**
+     * @param null|scalar|Stringable $value
+     */
+    public function setAttribute(string $name, $value): void;
 }
