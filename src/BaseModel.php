@@ -11,6 +11,7 @@ use ReflectionNamedType;
 use Stringable;
 use Yiisoft\Strings\Inflector;
 use Yiisoft\Strings\StringHelper;
+use Yiisoft\Validator\ResultSet;
 
 use function array_key_exists;
 use function array_merge;
@@ -24,7 +25,7 @@ use function strpos;
 /**
  * Form model represents an HTML form: its data, validation and presentation.
  */
-abstract class AbstractModel implements ModelInterface
+abstract class BaseModel implements ModelInterface
 {
     private array $attributes;
     /** @var array<string, array<array-key, string>> */
@@ -105,10 +106,7 @@ abstract class AbstractModel implements ModelInterface
 
     public function getError(string $attribute): array
     {
-        return
-            isset($this->attributesErrors[$attribute])
-                ? $this->attributesErrors[$attribute]
-                : [];
+        return isset($this->attributesErrors[$attribute]) ? $this->attributesErrors[$attribute] : [];
     }
 
     public function getErrors(): array
@@ -155,6 +153,11 @@ abstract class AbstractModel implements ModelInterface
         return $errors;
     }
 
+    public function getRules(): array
+    {
+        return [];
+    }
+
     public function hasAttribute(string $attribute): bool
     {
         return array_key_exists($attribute, $this->attributes);
@@ -176,15 +179,24 @@ abstract class AbstractModel implements ModelInterface
             $values = $data[$scope];
         }
 
-        /**
-         * @var string $name
-         * @var null|scalar|Stringable $value
-         */
+        /** @var array<string, null|scalar|Stringable> $values */
         foreach ($values as $name => $value) {
             $this->setAttribute($name, $value);
         }
 
         return $values !== [];
+    }
+
+    public function processValidationResult(ResultSet $resultSet): void
+    {
+        $this->clearErrors();
+
+        /** @var array<array-key, Resultset> $resultSet */
+        foreach ($resultSet as $attribute => $result) {
+            if ($result->isValid() === false) {
+                $this->addErrors([$attribute => $result->getErrors()]);
+            }
+        }
     }
 
     /**
@@ -197,21 +209,16 @@ abstract class AbstractModel implements ModelInterface
         if (isset($this->attributes[$realName])) {
             switch ($this->attributes[$realName]) {
                 case 'bool':
-                    $this->writeAttribute($name, $value);
+                    $value = (bool) $value;
                     break;
                 case 'float':
-                    $this->writeAttribute($name, $value);
+                    $value = (float) $value;
                     break;
                 case 'int':
-                    $this->writeAttribute($name, $value);
-                    break;
-                case 'string':
-                    $this->writeAttribute($name, $value);
-                    break;
-                default:
-                    $this->writeAttribute($name, $value);
+                    $value = (int) $value;
                     break;
             }
+            $this->writeAttribute($name, $value);
         }
     }
 

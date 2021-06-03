@@ -5,11 +5,18 @@ declare(strict_types=1);
 namespace Yii\Extension\Simple\Model\Tests;
 
 use ReflectionObject;
+use Yiisoft\Validator\Formatter;
+use Yiisoft\Validator\Validator;
 
 use function str_replace;
 
 abstract class TestCase extends \PHPUnit\Framework\TestCase
 {
+    protected function createValidator(): Validator
+    {
+        return new Validator(new Formatter());
+    }
+
     /**
      * Asserting two strings equality ignoring line endings.
      *

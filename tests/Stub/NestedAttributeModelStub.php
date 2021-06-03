@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Yii\Extension\Simple\Model\Tests\Stub;
 
-use Yii\Extension\Simple\Model\AbstractModel;
+use Yii\Extension\Simple\Model\BaseModel;
 
-final class NestedAttributeModelStub extends AbstractModel
+final class NestedAttributeModelStub extends BaseModel
 {
     private ?int $id = null;
     private ?LoginModelStub $user = null;

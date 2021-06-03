@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Yii\Extension\Simple\Model;
 
 use Stringable;
+use Yiisoft\Validator\PostValidationHookInterface;
+use Yiisoft\Validator\RulesProviderInterface;
 
 /**
  * ModelInterface model represents an HTML form: its data, validation and presentation.
  */
-interface ModelInterface
+interface ModelInterface extends PostValidationHookInterface, RulesProviderInterface
 {
     /**
      * Add error for the specified attribute.

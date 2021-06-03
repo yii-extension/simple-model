@@ -168,6 +168,12 @@ final class ModelTest extends TestCase
         $this->assertEquals('LoginModel', $model->getFormName());
     }
 
+    public function testGetRules(): void
+    {
+        $model = new ModelStub();
+        $this->assertSame([], $model->getRules());
+    }
+
     public function testHasAttribute(): void
     {
         $model = new LoginModelStub();
@@ -181,7 +187,6 @@ final class ModelTest extends TestCase
     public function testLoad(): void
     {
         $model = new LoginModelStub();
-
         $data = [];
 
         $model->load($data);
@@ -248,10 +253,19 @@ final class ModelTest extends TestCase
         $model->setAttribute('bool', false);
         $this->assertIsBool($model->getAttributeValue('bool'));
 
+        $model->setAttribute('bool', 'false');
+        $this->assertIsBool($model->getAttributeValue('bool'));
+
         $model->setAttribute('float', 1.434536);
         $this->assertIsFloat($model->getAttributeValue('float'));
 
+        $model->setAttribute('float', '1.434536');
+        $this->assertIsFloat($model->getAttributeValue('float'));
+
         $model->setAttribute('int', 1);
+        $this->assertIsInt($model->getAttributeValue('int'));
+
+        $model->setAttribute('int', '1');
         $this->assertIsInt($model->getAttributeValue('int'));
 
         $model->setAttribute('object', new stdClass());
@@ -259,6 +273,28 @@ final class ModelTest extends TestCase
 
         $model->setAttribute('string', '');
         $this->assertIsString($model->getAttributeValue('string'));
+    }
+
+    public function testValidatorRules(): void
+    {
+        $model = new LoginModelStub();
+        $validator = $this->createValidator();
+
+        $model->login('');
+        $validator->validate($model);
+        $this->assertEquals(['Value cannot be blank.'], $model->getError('login'));
+
+        $model->login('x');
+        $validator->validate($model);
+        $this->assertEquals(['Is too short.'], $model->getError('login'));
+
+        $model->login(str_repeat('x', 60));
+        $validator->validate($model);
+        $this->assertEquals('Is too long.', $model->getFirstError('login'));
+
+        $model->login('admin@.com');
+        $validator->validate($model);
+        $this->assertEquals('This value is not a valid email address.', $model->getFirstError('login'));
     }
 
     public function testUnknownPropertyType(): void

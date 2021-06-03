@@ -11,7 +11,8 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": "^7.4|^8.0"
+        "php": "^7.4|^8.0",
+        "yiisoft/validator": "^3.0@dev"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",

@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Yii\Extension\Simple\Model\Tests\Stub;
 
 use StdClass;
-use Yii\Extension\Simple\Model\AbstractModel;
+use Yii\Extension\Simple\Model\BaseModel;
+use Yiisoft\Validator\Rule\Email;
+use Yiisoft\Validator\Rule\HasLength;
+use Yiisoft\Validator\Rule\Required;
 
-final class LoginModelStub extends AbstractModel
+final class LoginModelStub extends BaseModel
 {
     public string $name = '';
     private static ?string $extraField = null;
@@ -71,5 +74,30 @@ final class LoginModelStub extends AbstractModel
     public function getFormName(): string
     {
         return 'LoginModel';
+    }
+
+    public function getRules(): array
+    {
+        return [
+            'login' => $this->loginRules(),
+            'password' => $this->passwordRules(),
+        ];
+    }
+
+    private function loginRules(): array
+    {
+        return [
+            Required::rule(),
+            HasLength::rule()->min(4)->max(40)->tooShortMessage('Is too short.')->tooLongMessage('Is too long.'),
+            Email::rule(),
+        ];
+    }
+
+    private function passwordRules(): array
+    {
+        return [
+            Required::rule(),
+            HasLength::rule()->min(8)->tooShortMessage('Is too short.'),
+        ];
     }
 }

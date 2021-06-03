@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Yii\Extension\Simple\Model\Tests\Stub;
 
-use Yii\Extension\Simple\Model\AbstractModel;
+use Yii\Extension\Simple\Model\BaseModel;
 
-final class ModelStub extends AbstractModel
+final class ModelStub extends BaseModel
 {
     public string $public;
     protected string $protected;
