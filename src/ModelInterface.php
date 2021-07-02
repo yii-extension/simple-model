@@ -80,7 +80,7 @@ interface ModelInterface extends PostValidationHookInterface, RulesProviderInter
      *
      * @param string $attribute
      *
-     * @return null|scalar|Stringable
+     * @return null|scalar|Stringable|iterable
      */
     public function getAttributeValue(string $attribute);
 
@@ -206,7 +206,7 @@ interface ModelInterface extends PostValidationHookInterface, RulesProviderInter
     public function load(array $data): bool;
 
     /**
-     * @param null|scalar|Stringable $value
+     * @param null|scalar|Stringable|iterable $value
      */
     public function setAttribute(string $name, $value): void;
 }

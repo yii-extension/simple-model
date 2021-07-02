@@ -92,7 +92,7 @@ abstract class BaseModel implements ModelInterface
     }
 
     /**
-     * @return null|scalar|Stringable
+     * @return null|scalar|Stringable|iterable
      */
     public function getAttributeValue(string $attribute)
     {
@@ -200,7 +200,7 @@ abstract class BaseModel implements ModelInterface
     }
 
     /**
-     * @param null|scalar|Stringable $value
+     * @param null|scalar|Stringable|iterable $value
      */
     public function setAttribute(string $name, $value): void
     {
@@ -319,7 +319,7 @@ abstract class BaseModel implements ModelInterface
     }
 
     /**
-     * @return null|scalar|Stringable
+     * @return null|scalar|Stringable|iterable
      *
      * @psalm-suppress MixedReturnStatement
      * @psalm-suppress MixedInferredReturnType
@@ -348,7 +348,7 @@ abstract class BaseModel implements ModelInterface
 
     /**
      * @param string $attribute
-     * @param null|scalar|Stringable $value
+     * @param null|scalar|Stringable|iterable $value
      *
      * @psalm-suppress MissingClosureReturnType
      */
