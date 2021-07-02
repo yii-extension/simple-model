@@ -4,49 +4,49 @@ declare(strict_types=1);
 
 namespace Yii\Extension\Simple\Model\Tests;
 
-use stdClass;
 use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 use Yii\Extension\Simple\Model\AttributeModel;
 use Yii\Extension\Simple\Model\Tests\Stub\ErrorModelStub;
 use Yii\Extension\Simple\Model\Tests\Stub\LoginModelStub;
 use Yii\Extension\Simple\Model\Tests\Stub\ModelStub;
 use Yii\Extension\Simple\Model\Tests\Stub\NestedAttributeModelStub;
 use Yii\Extension\Simple\Model\Tests\Stub\TypeModelStub;
+use Yii\Extension\Simple\Model\Tests\TestSupport\TestTrait;
 
 use function sprintf;
 
-final class ModelTest extends TestCase
+final class BaseModelTest extends TestCase
 {
+    use TestTrait;
+
     public function testAddError(): void
     {
         $model = new LoginModelStub();
-        $errorMessage = 'Invalid password.';
-        $model->addError('password', $errorMessage);
+        $model->addError('password', 'Invalid password.');
         $this->assertTrue($model->hasErrors());
-        $this->assertEquals($errorMessage, $model->getFirstError('password'));
+        $this->assertEquals('Invalid password.', $model->getFirstError('password'));
     }
 
     public function testClearErrors(): void
     {
-        $errorMessage = 'Invalid password.';
-
         $model = new LoginModelStub();
 
-        $model->addError('password', $errorMessage);
+        $model->addError('password', 'Invalid password.');
         $this->invokeMethod($model, 'clearErrors', ['password']);
         $this->assertEmpty($model->getError('password'));
 
-        $model->addError('password', $errorMessage);
+        $model->addError('password', 'Invalid password.');
         $this->invokeMethod($model, 'clearErrors');
         $this->assertEmpty($model->getErrors());
     }
 
     public function testGetAttributes(): void
     {
-        $attributeModel = $this->invokeMethod(new ModelStub(), 'getAttributes');
         $this->assertSame(
             ['public' => 'string', 'protected' => 'string', 'private' => 'string'],
-            $attributeModel,
+            $this->invokeMethod(new ModelStub(), 'getAttributes'),
         );
     }
 
@@ -79,19 +79,35 @@ final class ModelTest extends TestCase
 
     public function testGetAttributeValue(): void
     {
-        $model = new LoginModelStub();
-        $model->login('admin');
-        $this->assertEquals('admin', $model->getAttributeValue('login'));
+        $model = new TypeModelStub();
 
-        $model->password('123456');
-        $this->assertEquals('123456', $model->getAttributeValue('password'));
+        $model->setAttribute('array', [1, 2]);
+        $this->assertIsArray($model->getAttributeValue('array'));
+        $this->assertSame([1, 2], $model->getAttributeValue('array'));
 
-        $model->rememberMe(true);
-        $this->assertEquals(true, $model->getAttributeValue('rememberMe'));
+        $model->setAttribute('bool', true);
+        $this->assertIsBool($model->getAttributeValue('bool'));
+        $this->assertSame(true, $model->getAttributeValue('bool'));
+
+        $model->setAttribute('float', 1.2023);
+        $this->assertIsFloat($model->getAttributeValue('float'));
+        $this->assertSame(1.2023, $model->getAttributeValue('float'));
+
+        $model->setAttribute('int', 1);
+        $this->assertIsInt($model->getAttributeValue('int'));
+        $this->assertSame(1, $model->getAttributeValue('int'));
+
+        $model->setAttribute('object', new StdClass());
+        $this->assertIsObject($model->getAttributeValue('object'));
+        $this->assertInstanceOf(StdClass::class, $model->getAttributeValue('object'));
+
+        $model->setAttribute('string', 'samdark');
+        $this->assertIsString($model->getAttributeValue('string'));
+        $this->assertSame('samdark', $model->getAttributeValue('string'));
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Undefined property: "Yii\Extension\Simple\Model\Tests\Stub\LoginModelStub::noExist".'
+            'Undefined property: "Yii\Extension\Simple\Model\Tests\Stub\TypeModelStub::noExist".'
         );
         $model->getAttributeValue('noExist');
     }

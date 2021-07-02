@@ -2,15 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\Simple\Model\Tests;
+namespace Yii\Extension\Simple\Model\Tests\TestSupport;
 
 use ReflectionObject;
 use Yiisoft\Validator\Formatter;
 use Yiisoft\Validator\Validator;
 
-use function str_replace;
-
-abstract class TestCase extends \PHPUnit\Framework\TestCase
+trait TestTrait
 {
     protected function createValidator(): Validator
     {
@@ -38,19 +36,25 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      * @param object $object
      * @param string $method
      * @param array $args
+     * @param bool $revoke whether to make method inaccessible after execution.
      *
      * @throws ReflectionException
      *
      * @return mixed
      */
-    protected function invokeMethod(object $object, string $method, array $args = [])
+    protected function invokeMethod(object $object, string $method, array $args = [], bool $revoke = true)
     {
         $reflection = new ReflectionObject($object);
 
         $method = $reflection->getMethod($method);
+
         $method->setAccessible(true);
+
         $result = $method->invokeArgs($object, $args);
-        $method->setAccessible(false);
+
+        if ($revoke) {
+            $method->setAccessible(false);
+        }
         return $result;
     }
 }
