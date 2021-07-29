@@ -221,10 +221,12 @@ abstract class BaseModel implements ModelInterface
         }
     }
 
-    public function setAttributes(array $data): void
+    public function setAttributes(array $data, bool $toCamelCase = false): void
     {
         /** @var array<string, null|scalar|object|Stringable> $data */
         foreach ($data as $name => $value) {
+            $name = $toCamelCase ? $this->inflector->toCamelCase($name) : $name;
+
             if ($this->hasAttribute($name)) {
                 $this->setAttribute($name, $value);
             } else {

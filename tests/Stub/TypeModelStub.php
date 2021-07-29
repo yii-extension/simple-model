@@ -14,4 +14,5 @@ final class TypeModelStub extends BaseModel
     private int $int = 0;
     private ?object $object = null;
     private string $string = '';
+    private string $toCamelCase = '';
 }

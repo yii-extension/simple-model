@@ -301,6 +301,7 @@ final class BaseModelTest extends TestCase
     {
         $model = new TypeModelStub();
 
+        // set attributes with array and to camel case disabled.
         $model->setAttributes(
             [
                 'array' => [],
@@ -308,7 +309,8 @@ final class BaseModelTest extends TestCase
                 'float' => 1.434536,
                 'int' => 1,
                 'object' => new stdClass(),
-                'string' => ''
+                'string' => '',
+                'toCamelCase' => '',
             ]
         );
 
@@ -318,7 +320,9 @@ final class BaseModelTest extends TestCase
         $this->assertIsInt($model->getAttributeValue('int'));
         $this->assertIsObject($model->getAttributeValue('object'));
         $this->assertIsString($model->getAttributeValue('string'));
+        $this->assertIsString($model->getAttributeValue('toCamelCase'));
 
+        // set attributes with array and to camel case enabled.
         $model->setAttributes(
             [
                 'array' => [],
@@ -327,7 +331,9 @@ final class BaseModelTest extends TestCase
                 'int' => '1',
                 'object' => new stdClass(),
                 'string' => '',
-            ]
+                'to_camel_case' => '',
+            ],
+            true,
         );
 
         $this->assertIsArray($model->getAttributeValue('array'));
@@ -336,6 +342,7 @@ final class BaseModelTest extends TestCase
         $this->assertIsInt($model->getAttributeValue('int'));
         $this->assertIsObject($model->getAttributeValue('object'));
         $this->assertIsString($model->getAttributeValue('string'));
+        $this->assertIsString($model->getAttributeValue('toCamelCase'));
     }
 
     public function testSetAttributesException(): void
