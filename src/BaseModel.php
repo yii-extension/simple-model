@@ -16,7 +16,6 @@ use Yiisoft\Validator\ResultSet;
 use function array_key_exists;
 use function array_merge;
 use function explode;
-use function get_object_vars;
 use function is_subclass_of;
 use function reset;
 use function sprintf;
@@ -53,7 +52,7 @@ abstract class BaseModel implements ModelInterface
         [$attribute, $nested] = $this->getNestedAttribute($attribute);
 
         if ($nested !== null) {
-            /** @var ModelInterface */
+            /** @var ModelInterface $attributeNestedValue */
             $attributeNestedValue = $this->getAttributeValue($attribute);
             $hint = $attributeNestedValue->getAttributeHint($nested);
         }
@@ -78,7 +77,7 @@ abstract class BaseModel implements ModelInterface
         [$attribute, $nested] = $this->getNestedAttribute($attribute);
 
         if ($nested !== null) {
-            /** @var ModelInterface */
+            /** @var ModelInterface $attributeNestedValue */
             $attributeNestedValue = $this->getAttributeValue($attribute);
             $label = $attributeNestedValue->getAttributeLabel($nested);
         }
@@ -92,26 +91,16 @@ abstract class BaseModel implements ModelInterface
     }
 
     /**
-     * @return null|scalar|Stringable|iterable
+     * @return null|object|scalar|Stringable|iterable
      */
     public function getAttributeValue(string $attribute)
     {
         return $this->readAttribute($attribute);
     }
 
-    public function getFormName(): string
-    {
-        return substr(strrchr(static::class, '\\'), 1);
-    }
-
     public function getError(string $attribute): array
     {
-        return isset($this->attributesErrors[$attribute]) ? $this->attributesErrors[$attribute] : [];
-    }
-
-    public function getErrors(): array
-    {
-        return $this->attributesErrors;
+        return $this->attributesErrors[$attribute] ?? [];
     }
 
     public function getErrorSummary(bool $showAllErrors = true): array
@@ -125,6 +114,11 @@ abstract class BaseModel implements ModelInterface
         }
 
         return $lines;
+    }
+
+    public function getErrors(): array
+    {
+        return $this->attributesErrors;
     }
 
     public function getFirstError(string $attribute): string
@@ -151,6 +145,11 @@ abstract class BaseModel implements ModelInterface
         }
 
         return $errors;
+    }
+
+    public function getFormName(): string
+    {
+        return substr(strrchr(static::class, '\\'), 1);
     }
 
     public function getRules(): array
@@ -200,7 +199,7 @@ abstract class BaseModel implements ModelInterface
     }
 
     /**
-     * @param null|scalar|Stringable|iterable $value
+     * @param null|object|scalar|Stringable|iterable $value
      */
     public function setAttribute(string $name, $value): void
     {
@@ -209,16 +208,28 @@ abstract class BaseModel implements ModelInterface
         if (isset($this->attributes[$realName])) {
             switch ($this->attributes[$realName]) {
                 case 'bool':
-                    $value = (bool) $value;
+                    $value = (bool)$value;
                     break;
                 case 'float':
-                    $value = (float) $value;
+                    $value = (float)$value;
                     break;
                 case 'int':
-                    $value = (int) $value;
+                    $value = (int)$value;
                     break;
             }
             $this->writeAttribute($name, $value);
+        }
+    }
+
+    public function setAttributes(array $data): void
+    {
+        /** @var array<string, null|scalar|object|Stringable> $data */
+        foreach ($data as $name => $value) {
+            if ($this->hasAttribute($name)) {
+                $this->setAttribute($name, $value);
+            } else {
+                throw new InvalidArgumentException(sprintf('Attribute "%s" does not exist', $name));
+            }
         }
     }
 
@@ -296,7 +307,9 @@ abstract class BaseModel implements ModelInterface
     }
 
     /**
-     * @return (null|string)[]
+     * @param string $attribute
+     *
+     * @return array
      *
      * @psalm-return array{0: string, 1: null|string}
      */
@@ -336,7 +349,7 @@ abstract class BaseModel implements ModelInterface
         }
 
         /** @psalm-suppress MixedMethodCall */
-        $getter = static fn (ModelInterface $class, string $attribute) => $nested === null
+        $getter = static fn(ModelInterface $class, string $attribute) => $nested === null
             ? $class->$attribute
             : $class->$attribute->getAttributeValue($nested);
 
@@ -348,7 +361,7 @@ abstract class BaseModel implements ModelInterface
 
     /**
      * @param string $attribute
-     * @param null|scalar|Stringable|iterable $value
+     * @param null|object|scalar|Stringable|iterable $value
      *
      * @psalm-suppress MissingClosureReturnType
      */
@@ -360,7 +373,7 @@ abstract class BaseModel implements ModelInterface
          * @psalm-suppress MissingClosureParamType
          * @psalm-suppress MixedMethodCall
          */
-        $setter = static fn (ModelInterface $class, string $attribute, $value) => $nested === null
+        $setter = static fn(ModelInterface $class, string $attribute, $value) => $nested === null
             ? $class->$attribute = $value
             : $class->$attribute->setAttribute($nested, $value);
 

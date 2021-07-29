@@ -10,6 +10,6 @@ final class ModelStub extends BaseModel
 {
     public string $public;
     protected string $protected;
-    private string $private;
     private static string $static;
+    private string $private;
 }

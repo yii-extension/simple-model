@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yii\Extension\Simple\Model\Tests\Stub;
 
-use StdClass;
 use Yii\Extension\Simple\Model\BaseModel;
 use Yiisoft\Validator\Rule\Email;
 use Yiisoft\Validator\Rule\HasLength;

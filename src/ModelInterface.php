@@ -80,7 +80,7 @@ interface ModelInterface extends PostValidationHookInterface, RulesProviderInter
      *
      * @param string $attribute
      *
-     * @return null|scalar|Stringable|iterable
+     * @return null|object|scalar|Stringable|iterable
      */
     public function getAttributeValue(string $attribute);
 
@@ -156,8 +156,7 @@ interface ModelInterface extends PostValidationHookInterface, RulesProviderInter
     /**
      * Returns the form name that this model class should use.
      *
-     * The form name is mainly used by {@see \Yiisoft\Form\Helper\HtmlForm} to determine how to name the input
-     * fields for the attributes in a model.
+     * The form name is mainly used to determine how to name the input fields for the attributes in a model.
      * If the form name is "A" and an attribute name is "b", then the corresponding input name would be "A[b]".
      * If the form name is an empty string, then the input name would be "b".
      *
@@ -206,7 +205,9 @@ interface ModelInterface extends PostValidationHookInterface, RulesProviderInter
     public function load(array $data): bool;
 
     /**
-     * @param null|scalar|Stringable|iterable $value
+     * @param null|object|scalar|Stringable|iterable $value
      */
     public function setAttribute(string $name, $value): void;
+
+    public function setAttributes(array $data): void;
 }

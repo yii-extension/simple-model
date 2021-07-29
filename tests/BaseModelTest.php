@@ -6,8 +6,8 @@ namespace Yii\Extension\Simple\Model\Tests;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use ReflectionException;
 use stdClass;
-use Yii\Extension\Simple\Model\AttributeModel;
 use Yii\Extension\Simple\Model\Tests\Stub\ErrorModelStub;
 use Yii\Extension\Simple\Model\Tests\Stub\LoginModelStub;
 use Yii\Extension\Simple\Model\Tests\Stub\ModelStub;
@@ -29,6 +29,9 @@ final class BaseModelTest extends TestCase
         $this->assertEquals('Invalid password.', $model->getFirstError('password'));
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function testClearErrors(): void
     {
         $model = new LoginModelStub();
@@ -42,6 +45,9 @@ final class BaseModelTest extends TestCase
         $this->assertEmpty($model->getErrors());
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function testGetAttributes(): void
     {
         $this->assertSame(
@@ -259,7 +265,7 @@ final class BaseModelTest extends TestCase
         $this->assertEquals('doe', $model->getLastName());
     }
 
-    public function testSetAttributes(): void
+    public function testSetAttribute(): void
     {
         $model = new TypeModelStub();
 
@@ -289,6 +295,56 @@ final class BaseModelTest extends TestCase
 
         $model->setAttribute('string', '');
         $this->assertIsString($model->getAttributeValue('string'));
+    }
+
+    public function testSetAttributes(): void
+    {
+        $model = new TypeModelStub();
+
+        $model->setAttributes(
+            [
+                'array' => [],
+                'bool' => false,
+                'float' => 1.434536,
+                'int' => 1,
+                'object' => new stdClass(),
+                'string' => ''
+            ]
+        );
+
+        $this->assertIsArray($model->getAttributeValue('array'));
+        $this->assertIsBool($model->getAttributeValue('bool'));
+        $this->assertIsFloat($model->getAttributeValue('float'));
+        $this->assertIsInt($model->getAttributeValue('int'));
+        $this->assertIsObject($model->getAttributeValue('object'));
+        $this->assertIsString($model->getAttributeValue('string'));
+
+        $model->setAttributes(
+            [
+                'array' => [],
+                'bool' => 'false',
+                'float' => '1.434536',
+                'int' => '1',
+                'object' => new stdClass(),
+                'string' => '',
+            ]
+        );
+
+        $this->assertIsArray($model->getAttributeValue('array'));
+        $this->assertIsBool($model->getAttributeValue('bool'));
+        $this->assertIsFloat($model->getAttributeValue('float'));
+        $this->assertIsInt($model->getAttributeValue('int'));
+        $this->assertIsObject($model->getAttributeValue('object'));
+        $this->assertIsString($model->getAttributeValue('string'));
+    }
+
+    public function testSetAttributesException(): void
+    {
+        $model = new TypeModelStub();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Attribute "noExist" does not exist');
+        $model->setAttributes(['noExist' => []]);
     }
 
     public function testValidatorRules(): void
@@ -322,6 +378,6 @@ final class BaseModelTest extends TestCase
                 'property',
             )
         );
-        $model = new ErrorModelStub();
+        new ErrorModelStub();
     }
 }

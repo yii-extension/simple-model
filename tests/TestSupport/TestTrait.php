@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yii\Extension\Simple\Model\Tests\TestSupport;
 
+use ReflectionException;
 use ReflectionObject;
 use Yiisoft\Validator\Formatter;
 use Yiisoft\Validator\Validator;
@@ -16,21 +17,6 @@ trait TestTrait
     }
 
     /**
-     * Asserting two strings equality ignoring line endings.
-     *
-     * @param string $expected
-     * @param string $actual
-     * @param string $message
-     */
-    protected function assertEqualsWithoutLE(string $expected, string $actual, string $message = ''): void
-    {
-        $expected = str_replace("\r\n", "\n", $expected);
-        $actual = str_replace("\r\n", "\n", $actual);
-
-        $this->assertEquals($expected, $actual, $message);
-    }
-
-    /**
      * Invokes a inaccessible method.
      *
      * @param object $object
@@ -38,9 +24,9 @@ trait TestTrait
      * @param array $args
      * @param bool $revoke whether to make method inaccessible after execution.
      *
+     * @return mixed
      * @throws ReflectionException
      *
-     * @return mixed
      */
     protected function invokeMethod(object $object, string $method, array $args = [], bool $revoke = true)
     {
