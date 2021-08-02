@@ -17,6 +17,7 @@ use function array_key_exists;
 use function array_merge;
 use function explode;
 use function is_subclass_of;
+use function method_exists;
 use function reset;
 use function sprintf;
 use function strpos;
@@ -44,7 +45,8 @@ abstract class BaseModel implements ModelInterface
 
     public function getAttributeHint(string $attribute): string
     {
-        $attributeHints = $this->getAttributeHints();
+        /** @var array */
+        $attributeHints = method_exists($this, 'getAttributeHints') ? $this->getAttributeHints() : [];
 
         /** @var string */
         $hint = $attributeHints[$attribute] ?? '';
@@ -60,18 +62,16 @@ abstract class BaseModel implements ModelInterface
         return $hint;
     }
 
-    public function getAttributeHints(): array
-    {
-        return [];
-    }
-
     public function getAttributeLabel(string $attribute): string
     {
         $label = $this->generateAttributeLabel($attribute);
 
-        if (array_key_exists($attribute, $this->getAttributeLabels())) {
+        /** @var array */
+        $labels = method_exists($this, 'getAttributeLabels') ? $this->getAttributeLabels() : [];
+
+        if (array_key_exists($attribute, $labels)) {
             /** @var string */
-            $label = $this->getAttributeLabels()[$attribute];
+            $label = $labels[$attribute];
         }
 
         [$attribute, $nested] = $this->getNestedAttribute($attribute);
@@ -83,11 +83,6 @@ abstract class BaseModel implements ModelInterface
         }
 
         return $label;
-    }
-
-    public function getAttributeLabels(): array
-    {
-        return [];
     }
 
     /**
