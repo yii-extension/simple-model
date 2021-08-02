@@ -16,7 +16,7 @@
 ## Installation
 
 ```shell
-composer require simple/model
+composer require yii-extension/simple-model
 ```
 
 ### Unit testing
