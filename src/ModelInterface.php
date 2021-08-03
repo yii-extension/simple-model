@@ -173,9 +173,18 @@ interface ModelInterface extends PostValidationHookInterface, RulesProviderInter
     public function load(array $data): bool;
 
     /**
-     * @param null|object|scalar|Stringable|iterable $value
+     * Set the attributes value.
+     *
+     * @param string $name the attribute name.
+     * @param null|object|scalar|Stringable|iterable $value the attribute value.
      */
     public function setAttribute(string $name, $value): void;
 
-    public function setAttributes(array $data): void;
+    /**
+     * Set the attributes values.
+     *
+     * @param array $data the data array to load, typically server request attributes.
+     * @param bool $toCamelCase if set to true, the keys of `$data` will be camel cased.
+     */
+    public function setAttributes(array $data, bool $toCamelCase): void;
 }
