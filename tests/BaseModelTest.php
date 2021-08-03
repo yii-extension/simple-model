@@ -311,7 +311,8 @@ final class BaseModelTest extends TestCase
                 'object' => new stdClass(),
                 'string' => '',
                 'toCamelCase' => '',
-            ]
+            ],
+            false,
         );
 
         $this->assertIsArray($model->getAttributeValue('array'));
@@ -351,7 +352,7 @@ final class BaseModelTest extends TestCase
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Attribute "noExist" does not exist');
-        $model->setAttributes(['noExist' => []]);
+        $model->setAttributes(['noExist' => []], false);
     }
 
     public function testValidatorRules(): void
