@@ -360,26 +360,20 @@ final class BaseModelTest extends TestCase
         $model = new LoginModelStub();
         $validator = $this->createValidator();
 
-        $this->assertFalse($model->isValidated());
-
         $model->login('');
         $validator->validate($model);
-        $this->assertTrue($model->isValidated());
         $this->assertEquals(['Value cannot be blank.'], $model->getError('login'));
 
         $model->login('x');
         $validator->validate($model);
-        $this->assertTrue($model->isValidated());
         $this->assertEquals(['Is too short.'], $model->getError('login'));
 
         $model->login(str_repeat('x', 60));
         $validator->validate($model);
-        $this->assertTrue($model->isValidated());
         $this->assertEquals('Is too long.', $model->getFirstError('login'));
 
         $model->login('admin@.com');
         $validator->validate($model);
-        $this->assertTrue($model->isValidated());
         $this->assertEquals('This value is not a valid email address.', $model->getFirstError('login'));
     }
 
