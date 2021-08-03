@@ -31,6 +31,7 @@ abstract class BaseModel implements ModelInterface
     /** @var array<string, array<array-key, string>> */
     private array $attributesErrors = [];
     private Inflector $inflector;
+    private bool $validated = false;
 
     public function __construct()
     {
@@ -162,6 +163,11 @@ abstract class BaseModel implements ModelInterface
         return $attribute === null ? !empty($this->attributesErrors) : isset($this->attributesErrors[$attribute]);
     }
 
+    public function isValidated(): bool
+    {
+        return $this->validated;
+    }
+
     public function load(array $data): bool
     {
         $scope = $this->getFormName();
@@ -191,6 +197,8 @@ abstract class BaseModel implements ModelInterface
                 $this->addErrors([$attribute => $result->getErrors()]);
             }
         }
+
+        $this->validated = true;
     }
 
     /**
@@ -216,7 +224,7 @@ abstract class BaseModel implements ModelInterface
         }
     }
 
-    public function setAttributes(array $data, bool $toCamelCase = false): void
+    public function setAttributes(array $data, bool $toCamelCase): void
     {
         /** @var array<string, null|scalar|object|Stringable> $data */
         foreach ($data as $name => $value) {
@@ -249,6 +257,8 @@ abstract class BaseModel implements ModelInterface
         } else {
             unset($this->attributesErrors[$attribute]);
         }
+
+        $this->validated = false;
     }
 
     /**
