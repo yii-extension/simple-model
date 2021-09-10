@@ -70,6 +70,14 @@ final class LoginModelStub extends BaseModel
         ];
     }
 
+    public function getAttributePlaceholders(): array
+    {
+        return [
+            'login' => 'Type Usernamer or Email.',
+            'password' => 'Type Password.',
+        ];
+    }
+
     public function getFormName(): string
     {
         return 'LoginModel';

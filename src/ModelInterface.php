@@ -11,7 +11,7 @@ use Yiisoft\Validator\RulesProviderInterface;
 /**
  * ModelInterface model represents an HTML form: its data, validation and presentation.
  */
-interface ModelInterface extends PostValidationHookInterface, RulesProviderInterface
+interface ModelInterface extends ModelMetadataInterface, PostValidationHookInterface, RulesProviderInterface
 {
     /**
      * Add error for the specified attribute.
@@ -20,28 +20,6 @@ interface ModelInterface extends PostValidationHookInterface, RulesProviderInter
      * @param string $error attribute error message.
      */
     public function addError(string $attribute, string $error): void;
-
-    /**
-     * Returns the text hint for the specified attribute.
-     *
-     * @param string $attribute the attribute name.
-     *
-     * @return string the attribute hint.
-     *
-     * {@see getAttributeHints()}
-     */
-    public function getAttributeHint(string $attribute): string;
-
-    /**
-     * Returns the text label for the specified attribute.
-     *
-     * @param string $attribute the attribute name.
-     *
-     * @return string the attribute label.
-     *
-     * {@see getAttributeLabels()}
-     */
-    public function getAttributeLabel(string $attribute): string;
 
     /**
      * Returns the value for the specified attribute.

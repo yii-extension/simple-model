@@ -83,6 +83,22 @@ final class BaseModelTest extends TestCase
         $this->assertEquals('Public', $model->getAttributeLabel('public'));
     }
 
+    public function testGetAttributePlaceHolder(): void
+    {
+        $form = new LoginModelStub();
+
+        $this->assertEquals('Type Usernamer or Email.', $form->getAttributePlaceHolder('login'));
+        $this->assertEquals('Type Password.', $form->getAttributePlaceHolder('password'));
+        $this->assertEmpty($form->getAttributePlaceHolder('noExist'));
+    }
+
+    public function testGetNestedAttributePlaceHolder(): void
+    {
+        $form = new NestedAttributeModelStub();
+
+        $this->assertEquals('Type Usernamer or Email.', $form->getAttributePlaceHolder('user.login'));
+    }
+
     public function testGetAttributeValue(): void
     {
         $model = new TypeModelStub();

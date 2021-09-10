@@ -45,44 +45,58 @@ abstract class BaseModel implements ModelInterface
 
     public function getAttributeHint(string $attribute): string
     {
-        /** @var array */
-        $attributeHints = method_exists($this, 'getAttributeHints') ? $this->getAttributeHints() : [];
-
-        /** @var string */
+        $attributeHints = $this->getAttributeHints();
         $hint = $attributeHints[$attribute] ?? '';
+        $nestedAttributeHint = $this->getNestedAttributeValue('getAttributeHint', $attribute);
 
-        [$attribute, $nested] = $this->getNestedAttribute($attribute);
+        return $nestedAttributeHint !== '' ? $nestedAttributeHint : $hint;
+    }
 
-        if ($nested !== null) {
-            /** @var ModelInterface $attributeNestedValue */
-            $attributeNestedValue = $this->getAttributeValue($attribute);
-            $hint = $attributeNestedValue->getAttributeHint($nested);
-        }
-
-        return $hint;
+    /**
+     * @return string[]
+     */
+    public function getAttributeHints(): array
+    {
+        return [];
     }
 
     public function getAttributeLabel(string $attribute): string
     {
         $label = $this->generateAttributeLabel($attribute);
-
-        /** @var array */
-        $labels = method_exists($this, 'getAttributeLabels') ? $this->getAttributeLabels() : [];
+        $labels = $this->getAttributeLabels();
 
         if (array_key_exists($attribute, $labels)) {
-            /** @var string */
             $label = $labels[$attribute];
         }
 
-        [$attribute, $nested] = $this->getNestedAttribute($attribute);
+        $nestedAttributeLabel = $this->getNestedAttributeValue('getAttributeLabel', $attribute);
 
-        if ($nested !== null) {
-            /** @var ModelInterface $attributeNestedValue */
-            $attributeNestedValue = $this->getAttributeValue($attribute);
-            $label = $attributeNestedValue->getAttributeLabel($nested);
-        }
+        return $nestedAttributeLabel !== '' ? $nestedAttributeLabel : $label;
+    }
 
-        return $label;
+    /**
+     * @return string[]
+     */
+    public function getAttributeLabels(): array
+    {
+        return [];
+    }
+
+    public function getAttributePlaceholder(string $attribute): string
+    {
+        $attributePlaceHolders = $this->getAttributePlaceholders();
+        $placeholder = $attributePlaceHolders[$attribute] ?? '';
+        $nestedAttributePlaceholder = $this->getNestedAttributeValue('getAttributePlaceholder', $attribute);
+
+        return $nestedAttributePlaceholder !== '' ? $nestedAttributePlaceholder : $placeholder;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getAttributePlaceholders(): array
+    {
+        return [];
     }
 
     /**
@@ -166,6 +180,9 @@ abstract class BaseModel implements ModelInterface
     {
         $scope = $this->getFormName();
 
+        /**
+         * @psalm-var array<string, scalar|Stringable|null>
+         */
         $values = [];
 
         if (isset($data[$scope])) {
@@ -326,6 +343,22 @@ abstract class BaseModel implements ModelInterface
         }
 
         return [$attribute, $nested];
+    }
+
+    private function getNestedAttributeValue(string $method, string $attribute): string
+    {
+        $result = '';
+
+        [$attribute, $nested] = $this->getNestedAttribute($attribute);
+
+        if ($nested !== null) {
+            /** @var ModelInterface $attributeNestedValue */
+            $attributeNestedValue = $this->getAttributeValue($attribute);
+            /** @var string */
+            $result = $attributeNestedValue->$method($nested);
+        }
+
+        return $result;
     }
 
     /**
