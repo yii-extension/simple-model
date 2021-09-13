@@ -17,7 +17,6 @@ use function array_key_exists;
 use function array_merge;
 use function explode;
 use function is_subclass_of;
-use function method_exists;
 use function reset;
 use function sprintf;
 use function strpos;
@@ -259,13 +258,9 @@ abstract class BaseModel implements ModelInterface
         }
     }
 
-    private function clearErrors(string $attribute = ''): void
+    private function clearErrors(): void
     {
-        if ($attribute === '') {
-            $this->attributesErrors = [];
-        } else {
-            unset($this->attributesErrors[$attribute]);
-        }
+        $this->attributesErrors = [];
     }
 
     /**

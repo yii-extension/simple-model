@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yii\Extension\Simple\Model\Helper;
 
 use InvalidArgumentException;
+use Stringable;
 use UnexpectedValueException;
 use Yii\Extension\Simple\Model\ModelInterface;
 
@@ -16,36 +17,36 @@ final class HtmlModel
     /**
      * Return the attribute hint for the model.
      *
-     * @param ModelInterface $form the form object.
+     * @param ModelInterface $model the model interface.
      * @param string $attribute the attribute name or expression.
      *
      * @return string
      */
-    public static function getAttributeHint(ModelInterface $formModel, string $attribute): string
+    public static function getAttributeHint(ModelInterface $model, string $attribute): string
     {
-        return $formModel->getAttributeHint(self::getAttributeName($formModel, $attribute));
+        return $model->getAttributeHint(self::getAttributeName($model, $attribute));
     }
 
     /**
      * Returns the label of the specified attribute name.
      *
-     * @param ModelInterface $form the form object.
+     * @param ModelInterface $model the model interface.
      * @param string $attribute the attribute name or expression.
      *
      * @throws InvalidArgumentException if the attribute name contains non-word characters.
      *
      * @return string
      */
-    public static function getAttributeLabel(ModelInterface $formModel, string $attribute): string
+    public static function getAttributeLabel(ModelInterface $model, string $attribute): string
     {
-        return $formModel->getAttributeLabel(self::getAttributeName($formModel, $attribute));
+        return $model->getAttributeLabel(self::getAttributeName($model, $attribute));
     }
 
     /**
      * Returns the real attribute name from the given attribute expression.
      * If `$attribute` has neither prefix nor suffix, it will be returned back without change.
      *
-     * @param ModelInterface $form the form object.
+     * @param ModelInterface $model the model interface.
      * @param string $attribute the attribute name or expression
      *
      * @throws InvalidArgumentException if the attribute name contains non-word characters.
@@ -54,11 +55,11 @@ final class HtmlModel
      *
      * @see static::parseAttribute()
      */
-    public static function getAttributeName(ModelInterface $formModel, string $attribute): string
+    public static function getAttributeName(ModelInterface $model, string $attribute): string
     {
         $attribute = self::parseAttribute($attribute)['name'];
 
-        if (!$formModel->hasAttribute($attribute)) {
+        if (!$model->hasAttribute($attribute)) {
             throw new invalidArgumentException("Attribute '$attribute' does not exist.");
         }
 
@@ -74,29 +75,29 @@ final class HtmlModel
      * If an attribute value an array of such instances, the primary value(s) of the AR instance(s) will be returned
      * instead.
      *
-     * @param ModelInterface $form the form object.
+     * @param ModelInterface $model the model interface.
      * @param string $attribute the attribute name or expression.
      *
      * @throws InvalidArgumentException if the attribute name contains non-word characters.
      *
-     * @return iterable<mixed, mixed>|object|scalar|null the corresponding attribute value.
+     * @return scalar|iterable|object|Stringable|null the corresponding attribute value.
      */
-    public static function getAttributeValue(ModelInterface $formModel, string $attribute)
+    public static function getAttributeValue(ModelInterface $model, string $attribute)
     {
-        return $formModel->getAttributeValue(self::getAttributeName($formModel, $attribute));
+        return $model->getAttributeValue(self::getAttributeName($model, $attribute));
     }
 
     /**
      * Return the attribute first error message.
      *
-     * @param ModelInterface $form the form object.
+     * @param ModelInterface $model the model interface.
      * @param string $attribute the attribute name or expression.
      *
      * @return string
      */
-    public static function getFirstError(ModelInterface $formModel, string $attribute): string
+    public static function getFirstError(ModelInterface $model, string $attribute): string
     {
-        return $formModel->getFirstError(self::getAttributeName($formModel, $attribute));
+        return $model->getFirstError(self::getAttributeName($model, $attribute));
     }
 
     /**
@@ -135,7 +136,7 @@ final class HtmlModel
      *
      * See {@see getAttributeName()} for explanation of attribute expression.
      *
-     * @param ModelInterface $form the form object.
+     * @param ModelInterface $model the model interface.
      * @param string $attribute the attribute name or expression.
      *
      * @throws InvalidArgumentException if the attribute name contains non-word characters
@@ -143,11 +144,11 @@ final class HtmlModel
      *
      * @return string the generated input name.
      */
-    public static function getInputName(ModelInterface $formModel, string $attribute): string
+    public static function getInputName(ModelInterface $model, string $attribute): string
     {
         $data = self::parseAttribute($attribute);
-        $formName = $formModel->getFormName();
-        return "{$formName}{$data['prefix']}[{$data['name']}]{$data['suffix']}";
+        $formName = $model->getFormName();
+        return "$formName{$data['prefix']}[{$data['name']}]{$data['suffix']}";
     }
 
     /**
@@ -172,7 +173,7 @@ final class HtmlModel
      */
     private static function parseAttribute(string $attribute): array
     {
-        if (!preg_match('/(^|.*\])([\w\.\+]+)(\[.*|$)/u', $attribute, $matches)) {
+        if (!preg_match('/(^|.*])([\w.+]+)(\[.*|$)/u', $attribute, $matches)) {
             throw new InvalidArgumentException('Attribute name must contain word characters only.');
         }
         return [
