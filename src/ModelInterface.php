@@ -119,6 +119,40 @@ interface ModelInterface extends ModelMetadataInterface, PostValidationHookInter
     public function getFormName(): string;
 
     /**
+     * Returns the validation rules for attributes.
+     *
+     * Validation rules are used by {@see \Yiisoft\Validator\Validator} to check if attribute values are valid.
+     * Child classes may override this method to declare different validation rules.
+     *
+     * Each rule is an array with the following structure:
+     *
+     * ```php
+     * public function rules(): array
+     * {
+     *     return [
+     *         'login' => $this->loginRules()
+     *     ];
+     * }
+     *
+     * private function loginRules(): array
+     * {
+     *   return [
+     *       new \Yiisoft\Validator\Rule\Required(),
+     *       (new \Yiisoft\Validator\Rule\HasLength())
+     *       ->min(4)
+     *       ->max(40)
+     *       ->tooShortMessage('Is too short.')
+     *       ->tooLongMessage('Is too long.'),
+     *       new \Yiisoft\Validator\Rule\Email()
+     *   ];
+     * }
+     * ```
+     *
+     * @return array Validation rules.
+     */
+    public function getRules(): array;
+
+    /**
      * Returns a value indicating whether there is any validation error.
      *
      * @param string|null $attribute attribute name. Use null to check all attributes.
