@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\Simple\Model\Tests\Stub;
+namespace Yii\Extension\Simple\Model\Tests\Model;
 
 use Yii\Extension\Simple\Model\BaseModel;
 
-final class NestedAttributeModelStub extends BaseModel
+final class NestedAttributeModel extends BaseModel
 {
     private ?int $id = null;
-    private ?LoginModelStub $user = null;
-    private ?StubClass $stubClass = null;
+    private ?LoginModel $user = null;
+    private ?StubModel $stubModel = null;
 
     public function __construct()
     {
-        $this->user = new LoginModelStub();
-        $this->stubClass = new StubClass();
+        $this->user = new LoginModel();
+        $this->stubModel = new StubModel();
 
         parent::__construct();
     }

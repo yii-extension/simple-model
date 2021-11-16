@@ -2,12 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\Simple\Model\Tests\Stub;
+namespace Yii\Extension\Simple\Model\Tests\Model;
 
 use Yii\Extension\Simple\Model\BaseModel;
 
-final class TypeModelStub extends BaseModel
+final class TypeModel extends BaseModel
 {
+    public string $public;
+    protected string $protected;
     private array $array = [];
     private bool $bool = false;
     private float $float = 0;

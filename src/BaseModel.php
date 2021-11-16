@@ -27,19 +27,18 @@ use function strpos;
 abstract class BaseModel implements ModelInterface
 {
     private array $attributes;
-    /** @var array<string, array<array-key, string>> */
+    /** @psalm-var array<string, array<array-key, string>> */
     private array $attributesErrors = [];
-    private Inflector $inflector;
+    private string $formErrorsClass = ModelErrors::class;
+    private ModelErrorsInterface $formErrors;
+    private ?Inflector $inflector = null;
+    private bool $validated = false;
 
     public function __construct()
     {
+        $this->attributes = $this->collectAttributes();
         $this->inflector = new Inflector();
-        $this->attributes = $this->getAttributes();
-    }
-
-    public function addError(string $attribute, string $error): void
-    {
-        $this->addErrors([$attribute => [$error]]);
+        $this->formErrors = $this->createFormErrors();
     }
 
     public function getAttributeHint(string $attribute): string
@@ -99,70 +98,36 @@ abstract class BaseModel implements ModelInterface
     }
 
     /**
-     * @return null|object|scalar|Stringable|iterable
+     * @return iterable|object|scalar|Stringable|null
      */
     public function getAttributeValue(string $attribute)
     {
-        return $this->readAttribute($attribute);
+        return $this->readProperty($attribute);
     }
 
-    public function getError(string $attribute): array
+    /**
+     * @return ModelErrorsInterface Get FormErrors object.
+     */
+    public function getFormErrors(): ModelErrorsInterface
     {
-        return $this->attributesErrors[$attribute] ?? [];
+        return $this->formErrors;
     }
 
-    public function getErrorSummary(bool $showAllErrors = true): array
+    /**
+     * @return string Returns classname without a namespace part or empty string when class is anonymous
+     */
+    public function getFormName(): string
     {
-        $lines = [];
-        $errors = $showAllErrors ? $this->getErrors() : [$this->getFirstErrors()];
-
-        /** @var array $error */
-        foreach ($errors as $error) {
-            $lines = array_merge($lines, $error);
-        }
-
-        return $lines;
-    }
-
-    public function getErrors(): array
-    {
-        return $this->attributesErrors;
-    }
-
-    public function getFirstError(string $attribute): string
-    {
-        if (empty($this->attributesErrors[$attribute])) {
+        if (strpos(static::class, '@anonymous') !== false) {
             return '';
         }
 
-        return reset($this->attributesErrors[$attribute]);
-    }
-
-    public function getFirstErrors(): array
-    {
-        if (empty($this->attributesErrors)) {
-            return [];
+        $className = strrchr(static::class, '\\');
+        if ($className === false) {
+            return static::class;
         }
 
-        $errors = [];
-
-        foreach ($this->attributesErrors as $name => $es) {
-            if (!empty($es)) {
-                $errors[$name] = reset($es);
-            }
-        }
-
-        return $errors;
-    }
-
-    public function getFormName(): string
-    {
-        return substr(strrchr(static::class, '\\'), 1);
-    }
-
-    public function getRules(): array
-    {
-        return [];
+        return substr($className, 1);
     }
 
     public function hasAttribute(string $attribute): bool
@@ -170,26 +135,37 @@ abstract class BaseModel implements ModelInterface
         return array_key_exists($attribute, $this->attributes);
     }
 
-    public function hasErrors(?string $attribute = null): bool
+    /**
+     * @return string[]
+     */
+    public function getError(string $attribute): array
     {
-        return $attribute === null ? !empty($this->attributesErrors) : isset($this->attributesErrors[$attribute]);
+        return $this->attributesErrors[$attribute] ?? [];
     }
 
-    public function load(array $data): bool
+    /**
+     * @param array $data
+     * @param string|null $formName
+     *
+     * @return bool
+     */
+    public function load(array $data, ?string $formName = null): bool
     {
-        $scope = $this->getFormName();
+        $scope = $formName ?? $this->getFormName();
 
         /**
          * @psalm-var array<string, scalar|Stringable|null>
          */
         $values = [];
 
-        if (isset($data[$scope])) {
+        if ($scope === '' && !empty($data)) {
+            $values = $data;
+        } elseif (isset($data[$scope])) {
             /** @var mixed */
             $values = $data[$scope];
         }
 
-        /** @var array<string, null|scalar|Stringable> $values */
+        /** @var array<string, scalar|Stringable|null> $values */
         foreach ($values as $name => $value) {
             $this->setAttribute($name, $value);
         }
@@ -197,20 +173,10 @@ abstract class BaseModel implements ModelInterface
         return $values !== [];
     }
 
-    public function processValidationResult(ResultSet $resultSet): void
-    {
-        $this->clearErrors();
-
-        /** @var array<array-key, Resultset> $resultSet */
-        foreach ($resultSet as $attribute => $result) {
-            if ($result->isValid() === false) {
-                $this->addErrors([$attribute => $result->getErrors()]);
-            }
-        }
-    }
-
     /**
-     * @param null|object|scalar|Stringable|iterable $value
+     * @param iterable|object|scalar|Stringable|null $value
+     *
+     * @psalm-suppress PossiblyInvalidCast
      */
     public function setAttribute(string $name, $value): void
     {
@@ -219,24 +185,29 @@ abstract class BaseModel implements ModelInterface
         if (isset($this->attributes[$realName])) {
             switch ($this->attributes[$realName]) {
                 case 'bool':
-                    $value = (bool)$value;
+                    $this->writeProperty($name, (bool) $value);
                     break;
                 case 'float':
-                    $value = (float)$value;
+                    $this->writeProperty($name, (float) $value);
                     break;
                 case 'int':
-                    $value = (int)$value;
+                    $this->writeProperty($name, (int) $value);
+                    break;
+                case 'string':
+                    $this->writeProperty($name, (string) $value);
+                    break;
+                default:
+                    $this->writeProperty($name, $value);
                     break;
             }
-            $this->writeAttribute($name, $value);
         }
     }
 
-    public function setAttributes(array $data, bool $toCamelCase): void
+    public function setAttributes(array $data): void
     {
         /** @var array<string, null|scalar|object|Stringable> $data */
         foreach ($data as $name => $value) {
-            $name = $toCamelCase ? $this->inflector->toCamelCase($name) : $name;
+            $name = $this->inflector->toCamelCase($name);
 
             if ($this->hasAttribute($name)) {
                 $this->setAttribute($name, $value);
@@ -246,21 +217,79 @@ abstract class BaseModel implements ModelInterface
         }
     }
 
-    private function addErrors(array $items): void
+    public function setFormErrorsClass(string $formErrorsClass): void
     {
-        /**
-         * @var array<string, array<array-key, string>> $items
-         */
-        foreach ($items as $attribute => $errors) {
-            foreach ($errors as $error) {
-                $this->attributesErrors[$attribute][] = $error;
+        $this->formErrorsClass = $formErrorsClass;
+    }
+
+    public function processValidationResult(ResultSet $resultSet): void
+    {
+        $this->formErrors->clear();
+        /** @var array<array-key, Resultset> $resultSet */
+        foreach ($resultSet as $attribute => $result) {
+            if ($result->isValid() === false) {
+                /** @psalm-suppress InvalidArgument */
+                $this->addErrors([$attribute => $result->getErrors()]);
             }
         }
+        $this->validated = true;
+    }
+
+    public function getRules(): array
+    {
+        return [];
+    }
+
+    /**
+     * Returns the list of attribute types indexed by attribute names.
+     *
+     * By default, this method returns all non-static properties of the class.
+     *
+     * @return array list of attribute types indexed by attribute names.
+     */
+    protected function collectAttributes(): array
+    {
+        $class = new ReflectionClass($this);
+        $attributes = [];
+
+        foreach ($class->getProperties() as $property) {
+            if ($property->isStatic()) {
+                continue;
+            }
+
+            /** @var ReflectionNamedType|null $type */
+            $type = $property->getType();
+
+            $attributes[$property->getName()] = $type !== null ? $type->getName() : '';
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * @psalm-param array<string, array<array-key, string>> $items
+     */
+    private function addErrors(array $items): void
+    {
+        $this->formErrors->addErrors($items);
     }
 
     private function clearErrors(): void
     {
         $this->attributesErrors = [];
+        $this->validated = false;
+    }
+
+    private function createFormErrors(): ModelErrorsInterface
+    {
+        $formErrorsClass = $this->formErrorsClass;
+        $formErrorsClass = new $formErrorsClass();
+
+        if (!$formErrorsClass instanceof ModelErrorsInterface) {
+            throw new InvalidArgumentException('Form errors class must implement ' . ModelErrorsInterface::class);
+        }
+
+        return $formErrorsClass;
     }
 
     /**
@@ -277,48 +306,65 @@ abstract class BaseModel implements ModelInterface
      */
     private function generateAttributeLabel(string $name): string
     {
-        return StringHelper::uppercaseFirstCharacterInEachWord($this->inflector->toWords($name));
+        return StringHelper::uppercaseFirstCharacterInEachWord(
+            $this->inflector->toWords($name)
+        );
     }
 
     /**
-     * Returns the list of attribute types indexed by attribute names.
+     * @return iterable|scalar|Stringable|null
      *
-     * By default, this method returns all non-static properties of the class.
-     *
-     * @return array list of attribute types indexed by attribute names.
+     * @psalm-suppress MixedReturnStatement
+     * @psalm-suppress MixedInferredReturnType
+     * @psalm-suppress MissingClosureReturnType
      */
-    private function getAttributes(): array
+    private function readProperty(string $attribute)
     {
-        $class = new ReflectionClass($this);
-        $attributes = [];
+        $class = static::class;
 
-        foreach ($class->getProperties() as $property) {
-            if ($property->isStatic()) {
-                continue;
-            }
+        [$attribute, $nested] = $this->getNestedAttribute($attribute);
 
-            /** @var ReflectionNamedType|null $type */
-            $type = $property->getType();
-            if ($type === null) {
-                throw new InvalidArgumentException(
-                    sprintf(
-                        'You must specify the type hint for "%s" property in "%s" class.',
-                        $property->getName(),
-                        $property->getDeclaringClass()->getName(),
-                    )
-                );
-            }
-
-            $attributes[$property->getName()] = $type->getName();
+        if (!property_exists($class, $attribute)) {
+            throw new InvalidArgumentException("Undefined property: \"$class::$attribute\".");
         }
 
-        return $attributes;
+        /** @psalm-suppress MixedMethodCall */
+        $getter = static fn (ModelInterface $class, string $attribute) => $nested === null
+            ? $class->$attribute
+            : $class->$attribute->getAttributeValue($nested);
+
+        $getter = Closure::bind($getter, null, $this);
+
+        /** @var Closure $getter */
+        return $getter($this, $attribute);
     }
 
     /**
      * @param string $attribute
+     * @param iterable|object|scalar|Stringable|null $value
      *
-     * @return array
+     * @psalm-suppress MissingClosureReturnType
+     */
+    private function writeProperty(string $attribute, $value): void
+    {
+        [$attribute, $nested] = $this->getNestedAttribute($attribute);
+
+        /**
+         * @psalm-suppress MissingClosureParamType
+         * @psalm-suppress MixedMethodCall
+         */
+        $setter = static fn (ModelInterface $class, string $attribute, $value) => $nested === null
+            ? $class->$attribute = $value
+            : $class->$attribute->setAttribute($nested, $value);
+
+        $setter = Closure::bind($setter, null, $this);
+
+        /** @var Closure $setter */
+        $setter($this, $attribute, $value);
+    }
+
+    /**
+     * @return string[]
      *
      * @psalm-return array{0: string, 1: null|string}
      */
@@ -328,13 +374,13 @@ abstract class BaseModel implements ModelInterface
             return [$attribute, null];
         }
 
-        [$attribute, $nested] = explode('.', $attribute);
+        [$attribute, $nested] = explode('.', $attribute, 2);
 
-        /** @var object */
-        $attributeNested = $this->attributes[$attribute];
+        /** @var object|string */
+        $attributeNested = $this->attributes[$attribute] ?? '';
 
-        if (!is_subclass_of($attributeNested, ModelInterface::class)) {
-            throw new InvalidArgumentException('Nested attribute can only be of ' . ModelInterface::class . ' type.');
+        if (!is_subclass_of($attributeNested, self::class)) {
+            throw new InvalidArgumentException("Attribute \"$attribute\" is not a nested attribute.");
         }
 
         return [$attribute, $nested];
@@ -356,55 +402,8 @@ abstract class BaseModel implements ModelInterface
         return $result;
     }
 
-    /**
-     * @return null|scalar|Stringable|iterable
-     *
-     * @psalm-suppress MixedReturnStatement
-     * @psalm-suppress MixedInferredReturnType
-     * @psalm-suppress MissingClosureReturnType
-     */
-    private function readAttribute(string $attribute)
+    public function isValidated(): bool
     {
-        $class = static::class;
-
-        [$attribute, $nested] = $this->getNestedAttribute($attribute);
-
-        if (!property_exists($class, $attribute)) {
-            throw new InvalidArgumentException("Undefined property: \"$class::$attribute\".");
-        }
-
-        /** @psalm-suppress MixedMethodCall */
-        $getter = static fn(ModelInterface $class, string $attribute) => $nested === null
-            ? $class->$attribute
-            : $class->$attribute->getAttributeValue($nested);
-
-        $getter = Closure::bind($getter, null, $this);
-
-        /** @var Closure $getter */
-        return $getter($this, $attribute);
-    }
-
-    /**
-     * @param string $attribute
-     * @param null|object|scalar|Stringable|iterable $value
-     *
-     * @psalm-suppress MissingClosureReturnType
-     */
-    private function writeAttribute(string $attribute, $value): void
-    {
-        [$attribute, $nested] = $this->getNestedAttribute($attribute);
-
-        /**
-         * @psalm-suppress MissingClosureParamType
-         * @psalm-suppress MixedMethodCall
-         */
-        $setter = static fn(ModelInterface $class, string $attribute, $value) => $nested === null
-            ? $class->$attribute = $value
-            : $class->$attribute->setAttribute($nested, $value);
-
-        $setter = Closure::bind($setter, null, $this);
-
-        /** @var Closure $setter */
-        $setter($this, $attribute, $value);
+        return $this->validated;
     }
 }

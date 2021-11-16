@@ -24,7 +24,7 @@ interface ModelMetadataInterface
      * Attribute labels are mainly used for display purpose. For example, given an attribute `firstName`, we can
      * declare a label `First Name` which is more user-friendly and can be displayed to end users.
      *
-     * By default an attribute label is generated automatically. This method allows you to
+     * By default, an attribute label is generated automatically. This method allows you to
      * explicitly specify attribute labels.
      *
      * Note, in order to inherit labels defined in the parent class, a child class needs to merge the parent labels
@@ -49,7 +49,7 @@ interface ModelMetadataInterface
      * Returns the attribute hints.
      *
      * Attribute hints are mainly used for display purpose. For example, given an attribute `isPublic`, we can declare
-     * a hint `Whether the post should be visible for not logged in users`, which provides user-friendly description of
+     * a hint `Whether the post should be visible for not logged-in users`, which provides user-friendly description of
      * the attribute meaning and can be displayed to end users.
      *
      * Unlike label hint will not be generated, if its explicit declaration is omitted.

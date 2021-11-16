@@ -14,95 +14,24 @@ use Yiisoft\Validator\RulesProviderInterface;
 interface ModelInterface extends ModelMetadataInterface, PostValidationHookInterface, RulesProviderInterface
 {
     /**
-     * Add error for the specified attribute.
-     *
-     * @param string $attribute attribute name.
-     * @param string $error attribute error message.
-     */
-    public function addError(string $attribute, string $error): void;
-
-    /**
      * Returns the value for the specified attribute.
      *
      * @param string $attribute
      *
-     * @return null|object|scalar|Stringable|iterable
+     * @return iterable|object|scalar|Stringable|null
      */
     public function getAttributeValue(string $attribute);
 
     /**
-     * Returns the errors for single attribute.
-     *
-     * @param string $attribute attribute name. Use null to retrieve errors for all attributes.
-     *
-     * @return array
+     * @return ModelErrorsInterface Validation errors.
      */
-    public function getError(string $attribute): array;
-
-    /**
-     * Returns the errors for all attributes.
-     *
-     * @return array errors for all attributes or the specified attribute. null is returned if no error.
-     *
-     * Note that when returning errors for all attributes, the result is a two-dimensional array, like the following:
-     *
-     * ```php
-     * [
-     *     'username' => [
-     *         'Username is required.',
-     *         'Username must contain only word characters.',
-     *     ],
-     *     'email' => [
-     *         'Email address is invalid.',
-     *     ]
-     * ]
-     * ```
-     *
-     * {@see getFirstErrors()}
-     * {@see getFirstError()}
-     */
-    public function getErrors(): array;
-
-    /**
-     * Returns the errors for all attributes as a one-dimensional array.
-     *
-     * @param bool $showAllErrors boolean, if set to true every error message for each attribute will be shown otherwise
-     * only the first error message for each attribute will be shown.
-     *
-     * @return array errors for all attributes as a one-dimensional array. Empty array is returned if no error.
-     *
-     * {@see getErrors()}
-     * {@see getFirstErrors(){}
-     */
-    public function getErrorSummary(bool $showAllErrors): array;
-
-    /**
-     * Returns the first error of the specified attribute.
-     *
-     * @param string $attribute attribute name.
-     *
-     * @return string the error message. Empty string is returned if there is no error.
-     *
-     * {@see getErrors()}
-     * {@see getFirstErrors()}
-     */
-    public function getFirstError(string $attribute): string;
-
-    /**
-     * Returns the first error of every attribute in the model.
-     *
-     * @return array the first errors. The array keys are the attribute names, and the array values are the
-     * corresponding error messages. An empty array will be returned if there is no error.
-     *
-     * {@see getErrors()}
-     * {@see getFirstError()}
-     */
-    public function getFirstErrors(): array;
+    public function getFormErrors(): ModelErrorsInterface;
 
     /**
      * Returns the form name that this model class should use.
      *
-     * The form name is mainly used to determine how to name the input fields for the attributes in a model.
+     * The form name is mainly used by {@see \Yiisoft\Form\Helper\HtmlForm} to determine how to name the input
+     * fields for the attributes in a model.
      * If the form name is "A" and an attribute name is "b", then the corresponding input name would be "A[b]".
      * If the form name is an empty string, then the input name would be "b".
      *
@@ -153,13 +82,11 @@ interface ModelInterface extends ModelMetadataInterface, PostValidationHookInter
     public function getRules(): array;
 
     /**
-     * Returns a value indicating whether there is any validation error.
+     * This method allows knowing if the validation was executed or not in the model.
      *
-     * @param string|null $attribute attribute name. Use null to check all attributes.
-     *
-     * @return bool whether there is any error.
+     * @return bool If the model was validated.
      */
-    public function hasErrors(?string $attribute = null): bool;
+    public function isValidated(): bool;
 
     /**
      * Populates the model with input data.
@@ -175,28 +102,22 @@ interface ModelInterface extends ModelMetadataInterface, PostValidationHookInter
      * }
      * ```
      *
-     * `load()` gets the `'FormName'` from the {@see getFormName()} populates the model with the whole instead of
-     * `$data['FormName']`.
+     * `load()` gets the `'FormName'` from the {@see getFormName()} method (which you may override), unless the
+     * `$formName` parameter is given. If the form name is empty string, `load()` populates the model with the whole of
+     * `$data` instead of `$data['FormName']`.
      *
      * @param array $data the data array to load, typically server request attributes.
+     * @param string|null $formName scope from which to get data
      *
      * @return bool whether `load()` found the expected form in `$data`.
      */
-    public function load(array $data): bool;
+    public function load(array $data, ?string $formName = null): bool;
 
     /**
-     * Set the attributes value.
+     * Set specified attribute
      *
-     * @param string $name the attribute name.
-     * @param null|object|scalar|Stringable|iterable $value the attribute value.
+     * @param string $name of the attribute to set
+     * @param iterable|object|scalar|Stringable|null $value
      */
     public function setAttribute(string $name, $value): void;
-
-    /**
-     * Set the attributes values.
-     *
-     * @param array $data the data array to load, typically server request attributes.
-     * @param bool $toCamelCase if set to true, the keys of `$data` will be camel cased.
-     */
-    public function setAttributes(array $data, bool $toCamelCase): void;
 }
