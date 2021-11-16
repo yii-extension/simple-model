@@ -13,58 +13,85 @@ final class HtmlErrorTest extends TestCase
 {
     use TestTrait;
 
+    private array $data = [
+        'LoginModel' => [
+            'login' => 'admin@.com',
+            'password' => '123456',
+        ],
+    ];
+    private array $expected = [
+        'login' => ['This value is not a valid email address.'],
+        'password' => ['Is too short.'],
+    ];
+    private LoginModel $model;
+
     public function testGetAllErrors(): void
     {
-        $model = new LoginModel();
-
-        $data = [
-            'LoginModel' => [
-                'login' => 'admin@.com',
-                'password' => '123456',
-            ],
-        ];
-
-        $expected = [
-            'login' => ['This value is not a valid email address.'],
-            'password' => ['Is too short.'],
-        ];
-
         $validator = $this->createValidator();
+        $this->assertTrue($this->model->load($this->data));
+        $this->assertFalse($validator->validate($this->model)->isValid());
+        $this->assertSame($this->expected, HtmlErrors::getAllErrors($this->model));
+    }
 
-        $this->assertTrue($model->load($data));
-        $this->assertFalse($validator->validate($model)->isValid());
+    public function testGetErrors(): void
+    {
+        $validator = $this->createValidator();
+        $this->assertTrue($this->model->load($this->data));
+        $this->assertFalse($validator->validate($this->model)->isValid());
+        $this->assertSame(['This value is not a valid email address.'], HtmlErrors::getErrors($this->model, 'login'));
+    }
 
-        // check if all errors are returned
-        $this->assertTrue(HtmlErrors::hasErrors($model));
-
-        // get all errors
-        $this->assertSame(
-            $expected,
-            HtmlErrors::getAllErrors($model),
-        );
-
-        // get errors for specific attribute
-        $this->assertSame(
-            ['This value is not a valid email address.'],
-            HtmlErrors::getErrors($model, 'login'),
-        );
-
-        // get error summary first errors for specific attribute
-        $this->assertSame(
-            'This value is not a valid email address.',
-            HtmlErrors::getFirstError($model, 'login'),
-        );
-
-        // get error sumamary all errors
+    public function testGetErrorSummary(): void
+    {
+        $validator = $this->createValidator();
+        $this->assertTrue($this->model->load($this->data));
+        $this->assertFalse($validator->validate($this->model)->isValid());
         $this->assertSame(
             ['This value is not a valid email address.', 'Is too short.'],
-            HtmlErrors::getErrorSummary($model),
+            HtmlErrors::getErrorSummary($this->model),
         );
+    }
 
-        // get first error
+    public function testGetErrorSummaryFirstErrors(): void
+    {
+        $validator = $this->createValidator();
+        $this->assertTrue($this->model->load($this->data));
+        $this->assertFalse($validator->validate($this->model)->isValid());
         $this->assertSame(
-            'This value is not a valid email address.',
-            HtmlErrors::getFirstError($model, 'login'),
+            ['login' => 'This value is not a valid email address.', 'password' => 'Is too short.'],
+            HtmlErrors::getErrorSummaryFirstErrors($this->model),
         );
+    }
+
+    public function testGetFirstError(): void
+    {
+        $validator = $this->createValidator();
+        $this->assertTrue($this->model->load($this->data));
+        $this->assertFalse($validator->validate($this->model)->isValid());
+        $this->assertSame('This value is not a valid email address.', HtmlErrors::getFirstError($this->model, 'login'));
+    }
+
+    public function testGetFirstErrorEmpty(): void
+    {
+        $this->assertSame('', HtmlErrors::getFirstError($this->model, 'login'));
+    }
+
+    public function testGetFirstErrorsEmpty(): void
+    {
+        $this->assertSame([], HtmlErrors::getFirstErrors($this->model));
+    }
+
+    public function testHasError(): void
+    {
+        $validator = $this->createValidator();
+        $this->assertTrue($this->model->load($this->data));
+        $this->assertFalse($validator->validate($this->model)->isValid());
+        $this->assertTrue(HtmlErrors::hasErrors($this->model));
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->model = new LoginModel();
     }
 }

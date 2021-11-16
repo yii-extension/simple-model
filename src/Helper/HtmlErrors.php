@@ -72,6 +72,18 @@ final class HtmlErrors
     }
 
     /**
+     * Returns the first error of every attribute in the model.
+     *
+     * @param ModelInterface $model the form object.
+     *
+     * @return array the error message for all attributes. Empty array is returned if no error.
+     */
+    public static function getFirstErrors(ModelInterface $model): array
+    {
+        return $model->getFormErrors()->getFirstErrors();
+    }
+
+    /**
      * Returns a value indicating whether there is any validation error.
      *
      * @param ModelInterface $model the form object.
