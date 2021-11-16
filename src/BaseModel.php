@@ -22,15 +22,15 @@ use function sprintf;
 use function strpos;
 
 /**
- * Form model represents an HTML form: its data, validation and presentation.
+ * BaseModel represents an `HTML` form: its data, validation and presentation.
  */
 abstract class BaseModel implements ModelInterface
 {
+    protected string $modelErrorsClass = ModelErrors::class;
     private array $attributes;
     /** @psalm-var array<string, array<array-key, string>> */
     private array $attributesErrors = [];
-    private string $formErrorsClass = ModelErrors::class;
-    private ModelErrorsInterface $formErrors;
+    private ModelErrorsInterface $modelErrors;
     private Inflector $inflector;
     private bool $validated = false;
 
@@ -38,7 +38,7 @@ abstract class BaseModel implements ModelInterface
     {
         $this->attributes = $this->collectAttributes();
         $this->inflector = new Inflector();
-        $this->formErrors = $this->createFormErrors();
+        $this->modelErrors = $this->createModelErrors($this->modelErrorsClass);
     }
 
     public function getAttributeHint(string $attribute): string
@@ -106,11 +106,11 @@ abstract class BaseModel implements ModelInterface
     }
 
     /**
-     * @return ModelErrorsInterface Get FormErrors object.
+     * @return ModelErrorsInterface Get ModelErrors object.
      */
     public function getFormErrors(): ModelErrorsInterface
     {
-        return $this->formErrors;
+        return $this->modelErrors;
     }
 
     /**
@@ -217,14 +217,9 @@ abstract class BaseModel implements ModelInterface
         }
     }
 
-    public function setFormErrorsClass(string $formErrorsClass): void
-    {
-        $this->formErrorsClass = $formErrorsClass;
-    }
-
     public function processValidationResult(ResultSet $resultSet): void
     {
-        $this->formErrors->clear();
+        $this->modelErrors->clear();
         /** @var array<array-key, Resultset> $resultSet */
         foreach ($resultSet as $attribute => $result) {
             if ($result->isValid() === false) {
@@ -271,7 +266,7 @@ abstract class BaseModel implements ModelInterface
      */
     private function addErrors(array $items): void
     {
-        $this->formErrors->addErrors($items);
+        $this->modelErrors->addErrors($items);
     }
 
     private function clearErrors(): void
@@ -280,16 +275,15 @@ abstract class BaseModel implements ModelInterface
         $this->validated = false;
     }
 
-    private function createFormErrors(): ModelErrorsInterface
+    private function createModelErrors(string $modelErrorsClass): ModelErrorsInterface
     {
-        $formErrorsClass = $this->formErrorsClass;
-        $formErrorsClass = new $formErrorsClass();
+        $modelErrorsClass = new $modelErrorsClass();
 
-        if (!$formErrorsClass instanceof ModelErrorsInterface) {
-            throw new InvalidArgumentException('Form errors class must implement ' . ModelErrorsInterface::class);
+        if (!$modelErrorsClass instanceof ModelErrorsInterface) {
+            throw new InvalidArgumentException('Model errors class must implement ' . ModelErrorsInterface::class);
         }
 
-        return $formErrorsClass;
+        return $modelErrorsClass;
     }
 
     /**
