@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use ReflectionException;
 use stdClass;
+use Yii\Extension\Simple\Model\BaseModel;
 use Yii\Extension\Simple\Model\Helper\HtmlErrors;
 use Yii\Extension\Simple\Model\Tests\Model\LoginModel;
 use Yii\Extension\Simple\Model\Tests\Model\NestedAttributeModel;
@@ -17,19 +18,11 @@ use Yii\Extension\Simple\Model\Tests\TestSupport\TestTrait;
 
 use function sprintf;
 
+require __DIR__ . '/Model/NonNamespacedModel.php';
+
 final class BaseModelTest extends TestCase
 {
     use TestTrait;
-
-    public function testAddError(): void
-    {
-        $model = new LoginModel();
-        $errorMessage = 'Invalid password.';
-
-        $model->getFormErrors()->addError('password', $errorMessage);
-        $this->assertTrue(HtmlErrors::hasErrors($model));
-        $this->assertSame($errorMessage, HtmlErrors::getFirstError($model, 'password'));
-    }
 
     public function testGetAttributeHint(): void
     {
@@ -43,6 +36,12 @@ final class BaseModelTest extends TestCase
         $this->assertEmpty($model->getAttributeHint('noExist'));
     }
 
+    public function testGetAttributeHints(): void
+    {
+        $model = new StubModel();
+        $this->assertSame([], $model->getAttributeHints());
+    }
+
     public function testGetAttributeLabel(): void
     {
         $model = new LoginModel();
@@ -53,12 +52,24 @@ final class BaseModelTest extends TestCase
         $this->assertEquals('Login:', $model->getAttributeLabel('user.login'));
     }
 
+    public function testGetAttributeLabels(): void
+    {
+        $model = new StubModel();
+        $this->assertSame([], $model->getAttributeLabels());
+    }
+
     public function testGetAttributePlaceHolder(): void
     {
         $model = new LoginModel();
         $this->assertEquals('Type Usernamer or Email.', $model->getAttributePlaceHolder('login'));
         $this->assertEquals('Type Password.', $model->getAttributePlaceHolder('password'));
         $this->assertEmpty($model->getAttributePlaceHolder('noExist'));
+    }
+
+    public function testGetAttributePlaceHolders(): void
+    {
+        $model = new StubModel();
+        $this->assertSame([], $model->getAttributePlaceHolders());
     }
 
     public function testGetNestedAttributePlaceHolder(): void
@@ -110,15 +121,6 @@ final class BaseModelTest extends TestCase
         $this->assertEquals('admin', $model->getAttributeValue('user.login'));
     }
 
-    public function testGetNestedAttributeException(): void
-    {
-        $model = new NestedAttributeModel();
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Attribute "profile" is not a nested attribute.');
-        $model->getAttributeValue('profile.user');
-    }
-
     public function testGetAttributeValueWithNestedAttributeException(): void
     {
         $model = new NestedAttributeModel();
@@ -137,6 +139,28 @@ final class BaseModelTest extends TestCase
 
         $model = new LoginModel();
         $this->assertEquals('LoginModel', $model->getFormName());
+
+        $model = new class () extends BaseModel {
+        };
+        $this->assertEquals('', $model->getFormName());
+
+        $model = new \NonNamespacedModel();
+        $this->assertEquals('NonNamespacedModel', $model->getFormName());
+    }
+
+    public function testGetNestedAttributeException(): void
+    {
+        $model = new NestedAttributeModel();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Attribute "profile" is not a nested attribute.');
+        $model->getAttributeValue('profile.user');
+    }
+
+    public function testGetIsValidated(): void
+    {
+        $model = new StubModel();
+        $this->assertSame(false, $model->isValidated());
     }
 
     public function testGetRules(): void
@@ -212,6 +236,37 @@ final class BaseModelTest extends TestCase
         $this->assertTrue($model->load($data));
         $this->assertEquals('joe', $model->getName());
         $this->assertEquals('doe', $model->getLastName());
+    }
+
+    public function testLoadWithEmptyScope(): void
+    {
+        $model = new class () extends BaseModel {
+            private int $int = 1;
+            private string $string = 'string';
+            private float $float = 3.14;
+            private bool $bool = true;
+        };
+        $model->load([
+            'int' => '2',
+            'float' => '3.15',
+            'bool' => 'false',
+            'string' => 555,
+        ], '');
+        $this->assertIsInt($model->getAttributeValue('int'));
+        $this->assertIsFloat($model->getAttributeValue('float'));
+        $this->assertIsBool($model->getAttributeValue('bool'));
+        $this->assertIsString($model->getAttributeValue('string'));
+    }
+
+    public function testsModelErrorsException(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Model errors class must implement Yii\Extension\Simple\Model\ModelErrorsInterface'
+        );
+        $model = new class () extends BaseModel {
+            protected string $modelErrorsClass = \stdClass::class;
+        };
     }
 
     public function testSetAttribute(): void

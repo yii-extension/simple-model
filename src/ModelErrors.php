@@ -32,6 +32,11 @@ final class ModelErrors implements ModelErrorsInterface
         }
     }
 
+    public function clear(): void
+    {
+        $this->attributesErrors = [];
+    }
+
     public function getAllErrors(): array
     {
         return $this->attributesErrors;
@@ -81,11 +86,6 @@ final class ModelErrors implements ModelErrorsInterface
     public function hasErrors(?string $attribute = null): bool
     {
         return $attribute === null ? !empty($this->attributesErrors) : isset($this->attributesErrors[$attribute]);
-    }
-
-    public function clear(): void
-    {
-        $this->attributesErrors = [];
     }
 
     private function renderErrorSumary(array $errors): array

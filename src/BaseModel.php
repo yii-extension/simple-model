@@ -106,14 +106,6 @@ abstract class BaseModel implements ModelInterface
     }
 
     /**
-     * @return ModelErrorsInterface Get ModelErrors object.
-     */
-    public function getFormErrors(): ModelErrorsInterface
-    {
-        return $this->modelErrors;
-    }
-
-    /**
      * @return string Returns classname without a namespace part or empty string when class is anonymous
      */
     public function getFormName(): string
@@ -136,11 +128,11 @@ abstract class BaseModel implements ModelInterface
     }
 
     /**
-     * @return string[]
+     * @return ModelErrorsInterface Get ModelErrors object.
      */
-    public function getError(string $attribute): array
+    public function getModelErrors(): ModelErrorsInterface
     {
-        return $this->attributesErrors[$attribute] ?? [];
+        return $this->modelErrors;
     }
 
     /**
@@ -220,6 +212,8 @@ abstract class BaseModel implements ModelInterface
     public function processValidationResult(ResultSet $resultSet): void
     {
         $this->modelErrors->clear();
+        $this->validated = false;
+
         /** @var array<array-key, Resultset> $resultSet */
         foreach ($resultSet as $attribute => $result) {
             if ($result->isValid() === false) {
@@ -227,12 +221,18 @@ abstract class BaseModel implements ModelInterface
                 $this->addErrors([$attribute => $result->getErrors()]);
             }
         }
+
         $this->validated = true;
     }
 
     public function getRules(): array
     {
         return [];
+    }
+
+    public function isValidated(): bool
+    {
+        return $this->validated;
     }
 
     /**
@@ -267,12 +267,6 @@ abstract class BaseModel implements ModelInterface
     private function addErrors(array $items): void
     {
         $this->modelErrors->addErrors($items);
-    }
-
-    private function clearErrors(): void
-    {
-        $this->attributesErrors = [];
-        $this->validated = false;
     }
 
     private function createModelErrors(string $modelErrorsClass): ModelErrorsInterface
@@ -394,10 +388,5 @@ abstract class BaseModel implements ModelInterface
         }
 
         return $result;
-    }
-
-    public function isValidated(): bool
-    {
-        return $this->validated;
     }
 }

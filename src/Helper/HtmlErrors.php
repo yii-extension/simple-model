@@ -20,7 +20,7 @@ final class HtmlErrors
      */
     public static function getAllErrors(ModelInterface $model): array
     {
-        return $model->getFormErrors()->getAllErrors();
+        return $model->getModelErrors()->getAllErrors();
     }
 
     /**
@@ -31,7 +31,7 @@ final class HtmlErrors
      */
     public static function getErrors(ModelInterface $model, string $attribute): array
     {
-        return $model->getFormErrors()->getErrors($attribute);
+        return $model->getModelErrors()->getErrors($attribute);
     }
 
     /**
@@ -43,7 +43,7 @@ final class HtmlErrors
      */
     public static function getErrorSummaryFirstErrors(ModelInterface $model): array
     {
-        return $model->getFormErrors()->getErrorSummaryFirstErrors();
+        return $model->getModelErrors()->getErrorSummaryFirstErrors();
     }
 
     /**
@@ -55,7 +55,7 @@ final class HtmlErrors
      */
     public static function getErrorSummary(ModelInterface $model): array
     {
-        return $model->getFormErrors()->getErrorSummary();
+        return $model->getModelErrors()->getErrorSummary();
     }
 
     /**
@@ -68,7 +68,7 @@ final class HtmlErrors
      */
     public static function getFirstError(ModelInterface $model, string $attribute): string
     {
-        return $model->getFormErrors()->getFirstError(HtmlModel::getAttributeName($model, $attribute));
+        return $model->getModelErrors()->getFirstError(HtmlModel::getAttributeName($model, $attribute));
     }
 
     /**
@@ -80,7 +80,7 @@ final class HtmlErrors
      */
     public static function getFirstErrors(ModelInterface $model): array
     {
-        return $model->getFormErrors()->getFirstErrors();
+        return $model->getModelErrors()->getFirstErrors();
     }
 
     /**
@@ -93,6 +93,6 @@ final class HtmlErrors
      */
     public static function hasErrors(ModelInterface $model, ?string $attribute = null): bool
     {
-        return $model->getFormErrors()->hasErrors($attribute);
+        return $model->getModelErrors()->hasErrors($attribute);
     }
 }

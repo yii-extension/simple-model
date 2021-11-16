@@ -23,6 +23,12 @@ final class HtmlModelTest extends TestCase
         $this->assertEmpty(HtmlModel::getAttributeHint($anonymousForm, 'age'));
     }
 
+    public function testGetAttributeLabel(): void
+    {
+        $model = new LoginModel();
+        $this->assertSame('Login:', HtmlModel::getAttributeLabel($model, 'login'));
+    }
+
     public function testGetAttributeName(): void
     {
         $model = new LoginModel();
@@ -59,6 +65,18 @@ final class HtmlModelTest extends TestCase
             [$anonymousModel, 'dates[0]', 'dates[0]'],
             [$anonymousModel, 'age', 'age'],
         ];
+    }
+
+    public function testGetAttributeValue(): void
+    {
+        $model = new LoginModel();
+        $this->assertNull(HtmlModel::getAttributeValue($model, 'login'));
+    }
+
+    public function testGetInputId(): void
+    {
+        $model = new LoginModel();
+        $this->assertSame('loginmodel-login', HtmlModel::getInputId($model, 'login'));
     }
 
     /**

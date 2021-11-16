@@ -23,11 +23,6 @@ interface ModelInterface extends ModelMetadataInterface, PostValidationHookInter
     public function getAttributeValue(string $attribute);
 
     /**
-     * @return ModelErrorsInterface Validation errors.
-     */
-    public function getFormErrors(): ModelErrorsInterface;
-
-    /**
      * Returns the form name that this model class should use.
      *
      * The form name is mainly used by {@see \Yiisoft\Form\Helper\HtmlForm} to determine how to name the input
@@ -46,6 +41,11 @@ interface ModelInterface extends ModelMetadataInterface, PostValidationHookInter
      * {@see load()}
      */
     public function getFormName(): string;
+
+    /**
+     * @return ModelErrorsInterface Validation errors.
+     */
+    public function getModelErrors(): ModelErrorsInterface;
 
     /**
      * Returns the validation rules for attributes.
