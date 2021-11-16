@@ -31,7 +31,7 @@ abstract class BaseModel implements ModelInterface
     private array $attributesErrors = [];
     private string $formErrorsClass = ModelErrors::class;
     private ModelErrorsInterface $formErrors;
-    private ?Inflector $inflector = null;
+    private Inflector $inflector;
     private bool $validated = false;
 
     public function __construct()
