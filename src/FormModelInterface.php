@@ -4,34 +4,33 @@ declare(strict_types=1);
 
 namespace Yii\Extension\Simple\Model;
 
-use Stringable;
 use Yiisoft\Validator\PostValidationHookInterface;
 use Yiisoft\Validator\RulesProviderInterface;
 
 /**
  * ModelInterface model represents an HTML form: its data, validation and presentation.
  */
-interface ModelInterface extends ModelMetadataInterface, PostValidationHookInterface, RulesProviderInterface
+interface FormModelInterface extends FormMetadataInterface, PostValidationHookInterface, RulesProviderInterface
 {
     /**
      * Returns the value for the specified attribute.
      *
      * @param string $attribute
      *
-     * @return iterable|object|scalar|Stringable|null
+     * @return array|object|string|bool|int|float|null
      */
-    public function getAttributeValue(string $attribute);
+    public function getAttributeValue(string $attribute): array|object|string|bool|int|float|null;
 
     /**
      * Returns the form name that this model class should use.
      *
-     * The form name is mainly used by {@see \Yiisoft\Form\Helper\HtmlForm} to determine how to name the input
-     * fields for the attributes in a model.
+     * The form name is mainly used by {@see \Yii\Extension\Simple\Model\Helper\HtmlForm} to determine how to name the
+     * input fields for the attributes in a model.
      * If the form name is "A" and an attribute name is "b", then the corresponding input name would be "A[b]".
      * If the form name is an empty string, then the input name would be "b".
      *
      * The purpose of the above naming schema is that for forms which contain multiple different models, the attributes
-     * of each model are grouped in sub-arrays of the POST-data and it is easier to differentiate between them.
+     * of each model are grouped in sub-arrays of the POST-data, and it is easier to differentiate between them.
      *
      * By default, this method returns the model class name (without the namespace part) as the form name. You may
      * override it when the model is used in different forms.
@@ -43,9 +42,9 @@ interface ModelInterface extends ModelMetadataInterface, PostValidationHookInter
     public function getFormName(): string;
 
     /**
-     * @return ModelErrorsInterface Validation errors.
+     * @return FormErrorsInterface Validation errors.
      */
-    public function getModelErrors(): ModelErrorsInterface;
+    public function getFormErrors(): FormErrorsInterface;
 
     /**
      * Returns the validation rules for attributes.
@@ -117,7 +116,7 @@ interface ModelInterface extends ModelMetadataInterface, PostValidationHookInter
      * Set specified attribute
      *
      * @param string $name of the attribute to set
-     * @param iterable|object|scalar|Stringable|null $value
+     * @param mixed $value
      */
-    public function setAttribute(string $name, $value): void;
+    public function setAttribute(string $name, mixed $value): void;
 }

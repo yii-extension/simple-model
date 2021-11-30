@@ -24,11 +24,11 @@ trait TestTrait
      * @param array $args
      * @param bool $revoke whether to make method inaccessible after execution.
      *
-     * @return mixed
      * @throws ReflectionException
      *
+     * @return mixed
      */
-    protected function invokeMethod(object $object, string $method, array $args = [], bool $revoke = true)
+    protected function invokeMethod(object $object, string $method, array $args = [], bool $revoke = true): mixed
     {
         $reflection = new ReflectionObject($object);
 
@@ -41,6 +41,7 @@ trait TestTrait
         if ($revoke) {
             $method->setAccessible(false);
         }
+
         return $result;
     }
 }

@@ -2,17 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\Simple\Model\Tests\Model;
+namespace Yii\Extension\Simple\Model\Tests\FormModel;
 
-use Yii\Extension\Simple\Model\BaseModel;
+use Yii\Extension\Simple\Model\FormModel;
 use Yiisoft\Validator\Rule\Email;
 use Yiisoft\Validator\Rule\HasLength;
 use Yiisoft\Validator\Rule\Required;
 
-final class LoginModel extends BaseModel
+final class Login extends FormModel
 {
     public string $name = '';
-    private static ?string $extraField = null;
     private string $lastName = '';
     private ?string $login = null;
     private ?string $password = null;
@@ -73,14 +72,14 @@ final class LoginModel extends BaseModel
     public function getAttributePlaceholders(): array
     {
         return [
-            'login' => 'Type Usernamer or Email.',
+            'login' => 'Type Username or Email.',
             'password' => 'Type Password.',
         ];
     }
 
     public function getFormName(): string
     {
-        return 'LoginModel';
+        return 'Login';
     }
 
     public function getRules(): array

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Yii\Extension\Simple\Model;
 
 /**
- * ModelErrors represents a form validation errors collection.
+ * FormErrors represents a form validation errors collection.
  */
-final class ModelErrors implements ModelErrorsInterface
+final class FormErrors implements FormErrorsInterface
 {
     /** @psalm-var array<string, array<array-key, string>> */
     private array $attributesErrors;
@@ -49,12 +49,12 @@ final class ModelErrors implements ModelErrorsInterface
 
     public function getErrorSummary(): array
     {
-        return $this->renderErrorSumary($this->getAllErrors());
+        return $this->renderErrorSummary($this->getAllErrors());
     }
 
     public function getErrorSummaryFirstErrors(): array
     {
-        return $this->renderErrorSumary([$this->getFirstErrors()]);
+        return $this->renderErrorSummary([$this->getFirstErrors()]);
     }
 
     public function getFirstError(string $attribute): string
@@ -88,7 +88,7 @@ final class ModelErrors implements ModelErrorsInterface
         return $attribute === null ? !empty($this->attributesErrors) : isset($this->attributesErrors[$attribute]);
     }
 
-    private function renderErrorSumary(array $errors): array
+    private function renderErrorSummary(array $errors): array
     {
         $lines = [];
 

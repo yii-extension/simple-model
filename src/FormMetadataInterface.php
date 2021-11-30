@@ -7,7 +7,7 @@ namespace Yii\Extension\Simple\Model;
 /**
  * FormModelInterface model represents an HTML form: its data, validation and presentation.
  */
-interface ModelMetadataInterface
+interface FormMetadataInterface
 {
     /**
      * Returns the text label for the specified attribute.
@@ -24,15 +24,15 @@ interface ModelMetadataInterface
      * Attribute labels are mainly used for display purpose. For example, given an attribute `firstName`, we can
      * declare a label `First Name` which is more user-friendly and can be displayed to end users.
      *
-     * By default, an attribute label is generated automatically. This method allows you to
-     * explicitly specify attribute labels.
+     * By default, an attribute label is generated automatically. This method allows you to explicitly specify attribute
+     * labels.
      *
      * Note, in order to inherit labels defined in the parent class, a child class needs to merge the parent labels
      * with child labels using functions such as `array_merge()`.
      *
      * @return array attribute labels (name => label)
      *
-     * {@see \Yiisoft\Form\FormModel::getAttributeLabel()}
+     * {@see \Yii\Extension\Simple\Model\FormModel::getAttributeLabel()}
      */
     public function getAttributeLabels(): array;
 

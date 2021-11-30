@@ -7,7 +7,7 @@ namespace Yii\Extension\Simple\Model;
 /**
  * ModelError represents a form errors collection.
  */
-interface ModelErrorsInterface
+interface FormErrorsInterface
 {
     /**
      * Add an error for the specified attribute.
