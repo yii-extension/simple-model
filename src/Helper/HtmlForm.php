@@ -67,7 +67,7 @@ final class HtmlForm
     }
 
     /**
-     * Returns the label of the specified attribute name.
+     * Returns the placeholder of the specified attribute name.
      *
      * @param FormModelInterface $formModel the form object.
      * @param string $attribute the attribute name or expression.
