@@ -51,6 +51,13 @@ final class HtmlFormTest extends TestCase
         HtmlForm::getAttributeName($model, 'content body');
     }
 
+    public function testGetAttributePlaceHolder(): void
+    {
+        $model = new Login();
+        $this->assertSame('Type Username or Email.', HtmlForm::getAttributePlaceHolder($model, 'login'));
+        $this->assertSame('Type Password.', HtmlForm::getAttributePlaceHolder($model, 'password'));
+    }
+
     public function dataGetInputName(): array
     {
         $loginModel = new Login();

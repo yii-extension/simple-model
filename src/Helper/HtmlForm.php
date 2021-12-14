@@ -67,6 +67,21 @@ final class HtmlForm
     }
 
     /**
+     * Returns the label of the specified attribute name.
+     *
+     * @param FormModelInterface $formModel the form object.
+     * @param string $attribute the attribute name or expression.
+     *
+     * @throws InvalidArgumentException if the attribute name contains non-word characters.
+     *
+     * @return string
+     */
+    public static function getAttributePlaceHolder(FormModelInterface $formModel, string $attribute): string
+    {
+        return $formModel->getAttributePlaceHolder(self::getAttributeName($formModel, $attribute));
+    }
+
+    /**
      * Returns the value of the specified attribute name or expression.
      *
      * For an attribute expression like `[0]dates[0]`, this method will return the value of `$form->dates[0]`.
