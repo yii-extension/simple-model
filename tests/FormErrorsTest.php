@@ -24,6 +24,9 @@ final class FormErrorsTest extends TestCase
         $model = new Login();
         $errorMessage = ['password' => ['0' => 'Invalid password.']];
 
+        $model->getFormErrors()->clear();
+        $this->assertEmpty($model->getFormErrors()->getFirstError('password'));
+
         $model->getFormErrors()->addErrors($errorMessage);
         $this->assertTrue($model->getFormErrors()->hasErrors('password'));
         $this->assertSame('Invalid password.', $model->getFormErrors()->getFirstError('password'));
