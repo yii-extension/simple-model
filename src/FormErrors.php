@@ -32,9 +32,13 @@ final class FormErrors implements FormErrorsInterface
         }
     }
 
-    public function clear(): void
+    public function clear(string $attribute = null): void
     {
-        $this->attributesErrors = [];
+        if ($attribute !== null) {
+            unset($this->attributesErrors[$attribute]);
+        } else {
+            $this->attributesErrors = [];
+        }
     }
 
     public function getAllErrors(): array

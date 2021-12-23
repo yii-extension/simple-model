@@ -208,7 +208,6 @@ abstract class FormModel implements FormModelInterface
 
     public function processValidationResult(ResultSet $resultSet): void
     {
-        $this->formErrors->clear();
         $this->validated = false;
 
         /** @var array<array-key, Resultset> $resultSet */
@@ -310,6 +309,8 @@ abstract class FormModel implements FormModelInterface
         $class = static::class;
 
         [$attribute, $nested] = $this->getNestedAttribute($attribute);
+
+        $this->formErrors->clear($attribute);
 
         if (!property_exists($class, $attribute)) {
             throw new InvalidArgumentException("Undefined property: \"$class::$attribute\".");

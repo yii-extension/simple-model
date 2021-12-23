@@ -27,9 +27,11 @@ interface FormErrorsInterface
     public function addErrors(array $items): void;
 
     /**
-     * Removes errors for all attributes.
+     * Removes errors for the specified attribute or all attributes.
+     *
+     * @param string $attribute Attribute name.
      */
-    public function clear(): void;
+    public function clear(string $attribute = null): void;
 
     /**
      * Returns errors for all attributes.
