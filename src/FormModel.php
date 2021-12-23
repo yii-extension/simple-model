@@ -171,6 +171,8 @@ abstract class FormModel implements FormModelInterface
     {
         [$realName] = $this->getNestedAttribute($name);
 
+        $this->formErrors->clear($realName);
+
         if (isset($this->attributes[$realName])) {
             switch ($this->attributes[$realName]) {
                 case 'bool':
@@ -309,8 +311,6 @@ abstract class FormModel implements FormModelInterface
         $class = static::class;
 
         [$attribute, $nested] = $this->getNestedAttribute($attribute);
-
-        $this->formErrors->clear($attribute);
 
         if (!property_exists($class, $attribute)) {
             throw new InvalidArgumentException("Undefined property: \"$class::$attribute\".");
