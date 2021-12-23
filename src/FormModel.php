@@ -171,8 +171,6 @@ abstract class FormModel implements FormModelInterface
     {
         [$realName] = $this->getNestedAttribute($name);
 
-        $this->formErrors->clear($realName);
-
         if (isset($this->attributes[$realName])) {
             switch ($this->attributes[$realName]) {
                 case 'bool':
@@ -212,9 +210,10 @@ abstract class FormModel implements FormModelInterface
     {
         $this->validated = false;
 
-        /** @var array<array-key, Resultset> $resultSet */
+        /** @var array<string, Resultset> $resultSet */
         foreach ($resultSet as $attribute => $result) {
             if ($result->isValid() === false) {
+                $this->formErrors->clear($attribute);
                 /** @psalm-suppress InvalidArgument */
                 $this->addErrors([$attribute => $result->getErrors()]);
             }
