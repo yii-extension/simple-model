@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Yii\Extension\FormModel\Contract;
 
-/**
- * FormErrors represents a form errors collection.
- */
 interface FormErrorsContract
 {
     /**

@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Yii\Extension\FormModel\Contract;
 
-/**
- * FormModelInterface model represents an HTML form: its data, validation and presentation.
- */
 interface FormMetadataContract
 {
     /**
