@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\FormModel\Helper;
+namespace Yii\Extension\FormModel\Attribute;
 
 use InvalidArgumentException;
 use UnexpectedValueException;
@@ -18,84 +18,9 @@ final class FormModelAttributes
      *
      * @return string
      */
-    public static function getAttributeHint(FormModelContract $formModel, string $attribute): string
+    public static function getHint(FormModelContract $formModel, string $attribute): string
     {
-        return $formModel->getAttributeHint(self::getAttributeName($formModel, $attribute));
-    }
-
-    /**
-     * Returns the label of the specified attribute name.
-     *
-     * @param FormModelContract $formModel the form object.
-     * @param string $attribute the attribute name or expression.
-     *
-     * @throws InvalidArgumentException if the attribute name contains non-word characters.
-     *
-     * @return string
-     */
-    public static function getAttributeLabel(FormModelContract $formModel, string $attribute): string
-    {
-        return $formModel->getAttributeLabel(self::getAttributeName($formModel, $attribute));
-    }
-
-    /**
-     * Returns the real attribute name from the given attribute expression.
-     * If `$attribute` has neither prefix nor suffix, it will be returned without change.
-     *
-     * @param FormModelContract $formModel the form object.
-     * @param string $attribute the attribute name or expression
-     *
-     * @throws InvalidArgumentException if the attribute name contains non-word characters.
-     *
-     * @return string the attribute name without prefix and suffix.
-     *
-     * @see static::parseAttribute()
-     */
-    public static function getAttributeName(FormModelContract $formModel, string $attribute): string
-    {
-        $attribute = self::parseAttribute($attribute)['name'];
-
-        if (!$formModel->hasAttribute($attribute)) {
-            throw new invalidArgumentException("Attribute '$attribute' does not exist.");
-        }
-
-        return $attribute;
-    }
-
-    /**
-     * Returns the placeholder of the specified attribute name.
-     *
-     * @param FormModelContract $formModel the form object.
-     * @param string $attribute the attribute name or expression.
-     *
-     * @throws InvalidArgumentException if the attribute name contains non-word characters.
-     *
-     * @return string
-     */
-    public static function getAttributePlaceHolder(FormModelContract $formModel, string $attribute): string
-    {
-        return $formModel->getAttributePlaceHolder(self::getAttributeName($formModel, $attribute));
-    }
-
-    /**
-     * Returns the value of the specified attribute name or expression.
-     *
-     * For an attribute expression like `[0]dates[0]`, this method will return the value of `$form->dates[0]`.
-     * See {@see getAttributeName()} for more details about attribute expression.
-     *
-     * If an attribute value an array of such instances, the primary value(s) of the AR instance(s) will be returned
-     * instead.
-     *
-     * @param FormModelContract $formModel the form object.
-     * @param string $attribute the attribute name or expression.
-     *
-     * @throws InvalidArgumentException if the attribute name contains non-word characters.
-     *
-     * @return mixed the corresponding attribute value.
-     */
-    public static function getAttributeValue(FormModelContract $formModel, string $attribute): mixed
-    {
-        return $formModel->getAttributeValue(self::getAttributeName($formModel, $attribute));
+        return $formModel->getHint(self::getName($formModel, $attribute));
     }
 
     /**
@@ -106,7 +31,7 @@ final class FormModelAttributes
      * For example, if {@see getInputName()} returns `Post[content]`, this method will return `post-content`.
      *
      * @param FormModelContract $formModel the form object
-     * @param string $attribute the attribute name or expression. See {@see getAttributeName()} for explanation of
+     * @param string $attribute the attribute name or expression. See {@see getName()} for explanation of
      * attribute expression.
      * @param string $charset default `UTF-8`.
      *
@@ -132,7 +57,7 @@ final class FormModelAttributes
      * form name of the `Post` form is `Post`, then the input name generated for the `content` attribute would be
      * `Post[content]`.
      *
-     * See {@see getAttributeName()} for explanation of attribute expression.
+     * See {@see getName()} for explanation of attribute expression.
      *
      * @param FormModelContract $formModel the form object.
      * @param string $attribute the attribute name or expression.
@@ -144,7 +69,7 @@ final class FormModelAttributes
      */
     public static function getInputName(FormModelContract $formModel, string $attribute): string
     {
-        $data = self::parseAttribute($attribute);
+        $data = self::parse($attribute);
         $formName = $formModel->getFormName();
 
         if ($formName === '' && $data['prefix'] === '') {
@@ -156,6 +81,81 @@ final class FormModelAttributes
         }
 
         throw new InvalidArgumentException('formName() cannot be empty for tabular inputs.');
+    }
+
+    /**
+     * Returns the label of the specified attribute name.
+     *
+     * @param FormModelContract $formModel the form object.
+     * @param string $attribute the attribute name or expression.
+     *
+     * @throws InvalidArgumentException if the attribute name contains non-word characters.
+     *
+     * @return string
+     */
+    public static function getLabel(FormModelContract $formModel, string $attribute): string
+    {
+        return $formModel->getLabel(self::getName($formModel, $attribute));
+    }
+
+    /**
+     * Returns the real attribute name from the given attribute expression.
+     * If `$attribute` has neither prefix nor suffix, it will be returned without change.
+     *
+     * @param FormModelContract $formModel the form object.
+     * @param string $attribute the attribute name or expression
+     *
+     * @throws InvalidArgumentException if the attribute name contains non-word characters.
+     *
+     * @return string the attribute name without prefix and suffix.
+     *
+     * @see static::parse()
+     */
+    public static function getName(FormModelContract $formModel, string $attribute): string
+    {
+        $attribute = self::parse($attribute)['name'];
+
+        if (!$formModel->has($attribute)) {
+            throw new invalidArgumentException("Attribute '$attribute' does not exist.");
+        }
+
+        return $attribute;
+    }
+
+    /**
+     * Returns the placeholder of the specified attribute name.
+     *
+     * @param FormModelContract $formModel the form object.
+     * @param string $attribute the attribute name or expression.
+     *
+     * @throws InvalidArgumentException if the attribute name contains non-word characters.
+     *
+     * @return string
+     */
+    public static function getPlaceHolder(FormModelContract $formModel, string $attribute): string
+    {
+        return $formModel->getPlaceHolder(self::getName($formModel, $attribute));
+    }
+
+    /**
+     * Returns the value of the specified attribute name or expression.
+     *
+     * For an attribute expression like `[0]dates[0]`, this method will return the value of `$form->dates[0]`.
+     * See {@see getName()} for more details about attribute expression.
+     *
+     * If an attribute value an array of such instances, the primary value(s) of the AR instance(s) will be returned
+     * instead.
+     *
+     * @param FormModelContract $formModel the form object.
+     * @param string $attribute the attribute name or expression.
+     *
+     * @throws InvalidArgumentException if the attribute name contains non-word characters.
+     *
+     * @return mixed the corresponding attribute value.
+     */
+    public static function getValue(FormModelContract $formModel, string $attribute): mixed
+    {
+        return $formModel->getAttributeValue(self::getName($formModel, $attribute));
     }
 
     /**
@@ -178,7 +178,7 @@ final class FormModelAttributes
      *
      * @return string[] the attribute name, prefix and suffix.
      */
-    private static function parseAttribute(string $attribute): array
+    private static function parse(string $attribute): array
     {
         if (!preg_match('/(^|.*\])([\w\.\+\-_]+)(\[.*|$)/u', $attribute, $matches)) {
             throw new InvalidArgumentException('Attribute name must contain word characters only.');

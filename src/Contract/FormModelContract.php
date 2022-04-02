@@ -4,35 +4,8 @@ declare(strict_types=1);
 
 namespace Yii\Extension\FormModel\Contract;
 
-use Yiisoft\Validator\DataSetInterface;
-
-interface FormModelContract extends DataSetInterface, FormMetadataContract
+interface FormModelContract extends FormAttributesContract
 {
-    /**
-     * Return array with names of all attributes
-     *
-     * @return array
-     */
-    public function attributes(): array;
-
-    /**
-     * Returns the value for the specified attribute.
-     *
-     * @param string $attribute
-     *
-     * @return mixed
-     */
-    public function getAttributeValue(string $attribute): mixed;
-
-    /**
-     * If there is such attribute in the set.
-     *
-     * @param string $attribute
-     *
-     * @return bool
-     */
-    public function hasAttribute(string $attribute): bool;
-
     /**
      * @return FormErrorsContract Validation errors.
      */
@@ -132,7 +105,7 @@ interface FormModelContract extends DataSetInterface, FormMetadataContract
      * @param string $name of the attribute to set
      * @param mixed $value
      */
-    public function setAttribute(string $name, mixed $value): void;
+    public function set(string $name, mixed $value): void;
 
     /**
      * Set custom form errors instance.

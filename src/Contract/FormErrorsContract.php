@@ -12,7 +12,7 @@ interface FormErrorsContract
      * @param string $attribute Attribute name.
      * @param string $error Attribute error message.
      */
-    public function addError(string $attribute, string $error): void;
+    public function add(string $attribute, string $error): void;
 
     /**
      * Removes error for attributes.
@@ -20,6 +20,17 @@ interface FormErrorsContract
      * @param string $attribute Attribute name.
      */
     public function clear(string $attribute): void;
+
+    /**
+     * Returns errors for an attribute with a given name.
+     *
+     * @param string $attribute Attribute name.
+     *
+     * @return array
+     *
+     * @psalm-return string[]
+     */
+    public function get(string $attribute): array;
 
     /**
      * Returns errors for all attributes.
@@ -40,42 +51,12 @@ interface FormErrorsContract
      * ]
      * ```
      *
-     * {@see getFirstErrors()}
-     * {@see getFirstError()}
+     * {@see getFirst()}
+     * {@see getFirsts()}
      *
      * @psalm-return array<string, array<string>>
      */
-    public function getAllErrors(): array;
-
-    /**
-     * Returns errors for an attribute with a given name.
-     *
-     * @param string $attribute Attribute name.
-     *
-     * @return array
-     *
-     * @psalm-return string[]
-     */
-    public function getErrors(string $attribute): array;
-
-    /**
-     * Returns errors for all attributes as a one-dimensional array.
-     *
-     * @param array $onlyAttributes List of attributes to return errors.
-     *
-     * @return array errors for all attributes as a one-dimensional array. Empty array is returned if no error.
-     *
-     * {@see getErrors()}
-     * {@see getFirstErrors(){}
-     */
-    public function getErrorSummary(array $onlyAttributes): array;
-
-    /**
-     * Returns the first error of every attribute in the collection.
-     *
-     * @return array the first error of every attribute in the collection. Empty array is returned if no error.
-     */
-    public function getErrorSummaryFirstErrors(): array;
+    public function getAll(): array;
 
     /**
      * Returns the first error of the specified attribute.
@@ -84,10 +65,10 @@ interface FormErrorsContract
      *
      * @return string the error message. Empty string is returned if there is no error.
      *
-     * {@see getErrors()}
-     * {@see getFirstErrors()}
+     * {@see get()}
+     * {@see getFirsts()}
      */
-    public function getFirstError(string $attribute): string;
+    public function getFirst(string $attribute): string;
 
     /**
      * Returns the first error of every attribute in the model.
@@ -95,10 +76,29 @@ interface FormErrorsContract
      * @return array the first errors. The array keys are the attribute names, and the array values are the
      * corresponding error messages. An empty array will be returned if there is no error.
      *
-     * {@see getErrors()}
-     * {@see getFirstError()}
+     * {@see get()}
+     * {@see getFirst()}
      */
-    public function getFirstErrors(): array;
+    public function getFirsts(): array;
+
+    /**
+     * Returns errors for all attributes as a one-dimensional array.
+     *
+     * @param array $onlyAttributes List of attributes to return errors.
+     *
+     * @return array errors for all attributes as a one-dimensional array. Empty array is returned if no error.
+     *
+     * {@see get()}
+     * {@see getFirsts(){}
+     */
+    public function getSummary(array $onlyAttributes): array;
+
+    /**
+     * Returns the first error of every attribute in the collection.
+     *
+     * @return array the first error of every attribute in the collection. Empty array is returned if no error.
+     */
+    public function getSummaryFirst(): array;
 
     /**
      * Returns a value indicating whether there is any validation error.
@@ -107,5 +107,5 @@ interface FormErrorsContract
      *
      * @return bool whether there is any error.
      */
-    public function hasErrors(?string $attribute = null): bool;
+    public function has(?string $attribute = null): bool;
 }

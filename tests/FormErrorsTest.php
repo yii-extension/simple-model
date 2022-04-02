@@ -2,75 +2,73 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\Simple\Model\Tests;
+namespace Yii\Extension\FormModel\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Yii\Extension\Simple\Model\Tests\FormModel\Login;
+use Yii\Extension\FormModel\Tests\TestSupport\FormModel\Login;
 
 final class FormErrorsTest extends TestCase
 {
-    public function testAddError(): void
+    public function testAdd(): void
     {
-        $model = new Login();
+        $formModel = new Login();
         $errorMessage = 'Invalid password.';
-
-        $model->getFormErrors()->addError('password', $errorMessage);
-        $this->assertTrue($model->getFormErrors()->hasErrors('password'));
-        $this->assertSame($errorMessage, $model->getFormErrors()->getFirstError('password'));
+        $formModel->getFormErrors()->add('password', $errorMessage);
+        $this->assertTrue($formModel->getFormErrors()->has('password'));
+        $this->assertSame($errorMessage, $formModel->getFormErrors()->getFirst('password'));
     }
 
-    public function testAddErrors(): void
+    public function testAddMultipleErrors(): void
     {
-        $model = new Login();
+        $formModel = new Login();
         $errorMessage = ['password' => ['0' => 'Invalid password.']];
+        $formModel->getFormErrors()->clear();
+        $this->assertEmpty($formModel->getFormErrors()->getFirst('password'));
 
-        $model->getFormErrors()->clear();
-        $this->assertEmpty($model->getFormErrors()->getFirstError('password'));
-
-        $model->getFormErrors()->addErrors($errorMessage);
-        $this->assertTrue($model->getFormErrors()->hasErrors('password'));
-        $this->assertSame('Invalid password.', $model->getFormErrors()->getFirstError('password'));
+        $formModel->getFormErrors()->addMultiple($errorMessage);
+        $this->assertTrue($formModel->getFormErrors()->has('password'));
+        $this->assertSame('Invalid password.', $formModel->getFormErrors()->getFirst('password'));
     }
 
-    public function testGetAllErrors(): void
+    public function testGet(): void
     {
-        $model = new Login();
-        $this->assertSame('', $model->getFormErrors()->getFirstError('password'));
+        $formModel = new Login();
+        $this->assertSame([], $formModel->getFormErrors()->get('password'));
     }
 
-    public function testGetErrors(): void
+    public function testGetAll(): void
     {
-        $model = new Login();
-        $this->assertSame([], $model->getFormErrors()->getErrors('password'));
+        $formModel = new Login();
+        $this->assertSame([], $formModel->getFormErrors()->getAll());
     }
 
-    public function testGetErrorSummary(): void
+    public function testGetFirst(): void
     {
-        $model = new Login();
-        $this->assertSame([], $model->getFormErrors()->getErrorSummary());
+        $formModel = new Login();
+        $this->assertSame('', $formModel->getFormErrors()->getFirst('password'));
     }
 
-    public function testGetErrorSummaryFirstErrors(): void
+    public function testGetFirsts(): void
     {
-        $model = new Login();
-        $this->assertSame([], $model->getFormErrors()->getErrorSummaryFirstErrors());
+        $formModel = new Login();
+        $this->assertSame([], $formModel->getFormErrors()->getFirsts());
     }
 
-    public function testGetFirstError(): void
+    public function testGetSummary(): void
     {
-        $model = new Login();
-        $this->assertSame('', $model->getFormErrors()->getFirstError('password'));
+        $formModel = new Login();
+        $this->assertSame([], $formModel->getFormErrors()->getSummary());
     }
 
-    public function testGetFirstErrors(): void
+    public function testGetSummaryFirst(): void
     {
-        $model = new Login();
-        $this->assertSame([], $model->getFormErrors()->getFirstErrors());
+        $formModel = new Login();
+        $this->assertSame([], $formModel->getFormErrors()->getSummaryFirst());
     }
 
-    public function testHasErrors(): void
+    public function testHas(): void
     {
-        $model = new Login();
-        $this->assertSame(false, $model->getFormErrors()->hasErrors('password'));
+        $formModel = new Login();
+        $this->assertSame(false, $formModel->getFormErrors()->has('password'));
     }
 }

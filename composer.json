@@ -21,12 +21,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Yii\\Extension\\Simple\\Model\\": "src"
+            "Yii\\Extension\\FormModel\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Yii\\Extension\\Simple\\Model\\Tests\\": "tests"
+            "Yii\\Extension\\FormModel\\Tests\\": "tests"
         }
     },
     "extra": {
@@ -35,6 +35,9 @@
         }
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "infection/extension-installer": true
+        }
     }
 }

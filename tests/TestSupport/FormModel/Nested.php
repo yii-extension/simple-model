@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\Simple\Model\Tests\FormModel;
+namespace Yii\Extension\FormModel\Tests\TestSupport\FormModel;
 
-use Yii\Extension\Simple\Model\FormModel;
+use Yii\Extension\FormModel\FormModel;
 use Yiisoft\Validator\Rule\Required;
 
-final class NestedAttribute extends FormModel
+final class Nested extends FormModel
 {
     private ?int $id = null;
     private Login $user;

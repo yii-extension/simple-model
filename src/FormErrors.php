@@ -2,37 +2,35 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\Simple\Model;
+namespace Yii\Extension\FormModel;
 
-/**
- * FormErrors represents a form validation errors collection.
- */
-final class FormErrors implements FormErrorsInterface
+use Yii\Extension\FormModel\Contract\FormErrorsContract;
+
+use function array_flip;
+use function array_intersect_key;
+use function array_merge;
+use function reset;
+
+final class FormErrors implements FormErrorsContract
 {
-    /** @psalm-var array<string, array<array-key, string>> */
-    private array $attributesErrors;
-
-    public function __construct(array $attributesErrors = [])
+    /**
+     * @psalm-var string[] $attributesErrors
+     */
+    public function __construct(private array $attributesErrors = [])
     {
-        /** @psalm-var array<string, array<array-key, string>> */
-        $this->attributesErrors = $attributesErrors;
     }
 
-    public function addError(string $attribute, string $error): void
+    public function add(string $attribute, string $error): void
     {
         $this->attributesErrors[$attribute][] = $error;
     }
 
-    public function addErrors(array $items): void
+    public function addMultiple(array $values): void
     {
-        foreach ($items as $attribute => $errors) {
-            foreach ($errors as $error) {
-                $this->addError($attribute, $error);
-            }
-        }
+        $this->attributesErrors = $values;
     }
 
-    public function clear(string $attribute = null): void
+    public function clear(?string $attribute = null): void
     {
         if ($attribute !== null) {
             unset($this->attributesErrors[$attribute]);
@@ -41,36 +39,25 @@ final class FormErrors implements FormErrorsInterface
         }
     }
 
-    public function getAllErrors(): array
-    {
-        return $this->attributesErrors;
-    }
-
-    public function getErrors(string $attribute): array
+    public function get(string $attribute): array
     {
         return $this->attributesErrors[$attribute] ?? [];
     }
 
-    public function getErrorSummary(): array
+    public function getAll(): array
     {
-        return $this->renderErrorSummary($this->getAllErrors());
+        return $this->attributesErrors;
     }
 
-    public function getErrorSummaryFirstErrors(): array
+    public function getFirst(string $attribute): string
     {
-        return $this->renderErrorSummary([$this->getFirstErrors()]);
+        return match (empty($this->attributesErrors[$attribute])) {
+            true => '',
+            false => reset($this->attributesErrors[$attribute]),
+        };
     }
 
-    public function getFirstError(string $attribute): string
-    {
-        if (empty($this->attributesErrors[$attribute])) {
-            return '';
-        }
-
-        return reset($this->attributesErrors[$attribute]);
-    }
-
-    public function getFirstErrors(): array
+    public function getFirsts(): array
     {
         if (empty($this->attributesErrors)) {
             return [];
@@ -87,9 +74,28 @@ final class FormErrors implements FormErrorsInterface
         return $errors;
     }
 
-    public function hasErrors(?string $attribute = null): bool
+    public function getSummary(array $onlyAttributes = []): array
     {
-        return $attribute === null ? !empty($this->attributesErrors) : isset($this->attributesErrors[$attribute]);
+        $errors = $this->attributesErrors;
+
+        if ($onlyAttributes !== []) {
+            $errors = array_intersect_key($errors, array_flip($onlyAttributes));
+        }
+
+        return $this->renderErrorSummary($errors);
+    }
+
+    public function getSummaryFirst(): array
+    {
+        return $this->renderErrorSummary([$this->getFirsts()]);
+    }
+
+    public function has(?string $attribute = null): bool
+    {
+        return match ($attribute) {
+            null => !empty($this->attributesErrors),
+            default => isset($this->attributesErrors[$attribute]),
+        };
     }
 
     private function renderErrorSummary(array $errors): array
