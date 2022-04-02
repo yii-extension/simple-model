@@ -2,23 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\Simple\Model\Helper;
+namespace Yiisoft\Form\Helper;
 
-use Yii\Extension\Simple\Model\FormModelInterface;
+use Yii\Extension\FormModel\Contract\FormModelContract;
 
-/**
- * HtmlFormErrors renders a list of errors for the specified model attribute.
- */
-final class HtmlFormErrors
+final class FormErrorsAttributes
 {
     /**
      * Returns the errors for all attributes.
      *
-     * @param FormModelInterface $formModel the form object.
+     * @param FormModelContract $formModel the form object.
      *
-     * @return array the all errors message.
+     * @return array the error messages.
      */
-    public static function getAllErrors(FormModelInterface $formModel): array
+    public static function getAllErrors(FormModelContract $formModel): array
     {
         return $formModel->getFormErrors()->getAllErrors();
     }
@@ -26,24 +23,22 @@ final class HtmlFormErrors
     /**
      * Returns the errors for single attribute.
      *
-     * @param FormModelInterface $formModel the form object.
+     * @param FormModelContract $formModel the form object.
      * @param string $attribute attribute name. Use null to retrieve errors for all attributes.
-     *
-     * @return array the attribute error message.
      */
-    public static function getErrors(FormModelInterface $formModel, string $attribute): array
+    public static function getErrors(FormModelContract $formModel, string $attribute): array
     {
         return $formModel->getFormErrors()->getErrors($attribute);
     }
 
     /**
-     * Returns the first errors for all attributes as a one-dimensional array.
+     * Returns first errors for all attributes as a one-dimensional array.
      *
-     * @param FormModelInterface $formModel the form object.
+     * @param FormModelContract $formModel the form object.
      *
      * @return array errors for all attributes as a one-dimensional array. Empty array is returned if no error.
      */
-    public static function getErrorSummaryFirstErrors(FormModelInterface $formModel): array
+    public static function getErrorSummaryFirstErrors(FormModelContract $formModel): array
     {
         return $formModel->getFormErrors()->getErrorSummaryFirstErrors();
     }
@@ -51,24 +46,25 @@ final class HtmlFormErrors
     /**
      * Returns the errors for all attributes as a one-dimensional array.
      *
-     * @param FormModelInterface $formModel the form object.
+     * @param FormModelContract $formModel the form object.
+     * @param array $onlyAttributes list of attributes whose errors should be returned.
      *
      * @return array errors for all attributes as a one-dimensional array. Empty array is returned if no error.
      */
-    public static function getErrorSummary(FormModelInterface $formModel): array
+    public static function getErrorSummary(FormModelContract $formModel, array $onlyAttributes = []): array
     {
-        return $formModel->getFormErrors()->getErrorSummary();
+        return $formModel->getFormErrors()->getErrorSummary($onlyAttributes);
     }
 
     /**
      * Return the attribute first error message.
      *
-     * @param FormModelInterface $formModel the form object.
+     * @param FormModelContract $formModel the form object.
      * @param string $attribute the attribute name or expression.
      *
      * @return string the error message. Empty string returned if there is no error.
      */
-    public static function getFirstError(FormModelInterface $formModel, string $attribute): string
+    public static function getFirstError(FormModelContract $formModel, string $attribute): string
     {
         return $formModel->getFormErrors()->getFirstError(HtmlForm::getAttributeName($formModel, $attribute));
     }
@@ -76,11 +72,12 @@ final class HtmlFormErrors
     /**
      * Returns the first error of every attribute in the model.
      *
-     * @param FormModelInterface $formModel the form object.
+     * @param FormModelContract $formModel the form object.
      *
-     * @return array the error message for all attributes. Empty array is returned if no error.
+     * @return array The first error message for each attribute in a model. Empty array is returned if there is no
+     * error.
      */
-    public static function getFirstErrors(FormModelInterface $formModel): array
+    public static function getFirstErrors(FormModelContract $formModel): array
     {
         return $formModel->getFormErrors()->getFirstErrors();
     }
@@ -88,12 +85,12 @@ final class HtmlFormErrors
     /**
      * Returns a value indicating whether there is any validation error.
      *
-     * @param FormModelInterface $formModel the form object.
+     * @param FormModelContract $formModel the form object.
      * @param string|null $attribute attribute name. Use null to check all attributes.
      *
      * @return bool whether there is any error.
      */
-    public static function hasErrors(FormModelInterface $formModel, ?string $attribute = null): bool
+    public static function hasErrors(FormModelContract $formModel, ?string $attribute = null): bool
     {
         return $formModel->getFormErrors()->hasErrors($attribute);
     }
