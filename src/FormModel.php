@@ -185,7 +185,10 @@ abstract class FormModel implements FormModelContract, PostValidationHookInterfa
 
     public function sets(array $data): void
     {
-        /** @var array<string, mixed> $data */
+        /**
+         * @var array<string, mixed> $data
+         * @var mixed $value
+         */
         foreach ($data as $name => $value) {
             $name = $this->getInflector()->toCamelCase($name);
 

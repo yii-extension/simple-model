@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <phpunit bootstrap="vendor/autoload.php"
-         colors="true"
-         verbose="true"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true"
-         stopOnFailure="false"
-         failOnRisky="true">
+  colors="true"
+  verbose="true"
+  convertErrorsToExceptions="true"
+  convertNoticesToExceptions="true"
+  convertWarningsToExceptions="true"
+  stopOnFailure="false"
+  failOnRisky="true"
+>
   <php>
     <ini name="error_reporting" value="-1" />
   </php>
@@ -22,7 +23,7 @@
   </coverage>
 
   <testsuites>
-    <testsuite name="Simple-Model">
+    <testsuite name="Form">
       <directory>./tests</directory>
     </testsuite>
   </testsuites>

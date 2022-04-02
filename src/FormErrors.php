@@ -13,9 +13,7 @@ use function reset;
 
 final class FormErrors implements FormErrorsContract
 {
-    /**
-     * @psalm-var string[] $attributesErrors
-     */
+    /** @psalm-param array<string, array<array-key, string>> $attributesErrors */
     public function __construct(private array $attributesErrors = [])
     {
     }
@@ -25,6 +23,7 @@ final class FormErrors implements FormErrorsContract
         $this->attributesErrors[$attribute][] = $error;
     }
 
+    /** @psalm-param array<string, array<array-key, string>> $values */
     public function addMultiple(array $values): void
     {
         $this->attributesErrors = $values;
@@ -67,6 +66,7 @@ final class FormErrors implements FormErrorsContract
 
         foreach ($this->attributesErrors as $name => $es) {
             if (!empty($es)) {
+                /** @var mixed */
                 $errors[$name] = reset($es);
             }
         }
