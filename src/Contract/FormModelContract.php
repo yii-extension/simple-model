@@ -2,30 +2,50 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\Simple\Model;
+namespace Yii\Extension\FormModel\Contract;
 
-use Yiisoft\Validator\PostValidationHookInterface;
-use Yiisoft\Validator\RulesProviderInterface;
+use Yiisoft\Validator\DataSetInterface;
 
 /**
- * ModelInterface model represents an HTML form: its data, validation and presentation.
+ * FormModelInterface model represents an HTML form: its data, validation and presentation.
  */
-interface FormModelInterface extends FormMetadataInterface, PostValidationHookInterface, RulesProviderInterface
+interface FormModelContract extends DataSetInterface, FormMetadataContract
 {
+    /**
+     * Return array with names of all attributes
+     *
+     * @return array
+     */
+    public function attributes(): array;
+
     /**
      * Returns the value for the specified attribute.
      *
      * @param string $attribute
      *
-     * @return array|object|string|bool|int|float|null
+     * @return mixed
      */
-    public function getAttributeValue(string $attribute): array|object|string|bool|int|float|null;
+    public function getAttributeValue(string $attribute): mixed;
+
+    /**
+     * If there is such attribute in the set.
+     *
+     * @param string $attribute
+     *
+     * @return bool
+     */
+    public function hasAttribute(string $attribute): bool;
+
+    /**
+     * @return FormErrorsContract Validation errors.
+     */
+    public function getFormErrors(): FormErrorsContract;
 
     /**
      * Returns the form name that this model class should use.
      *
-     * The form name is mainly used by {@see \Yii\Extension\Simple\Model\Helper\HtmlForm} to determine how to name the
-     * input fields for the attributes in a model.
+     * The form name is mainly used by {@see \Yiisoft\Form\Helper\HtmlForm} to determine how to name the input
+     * fields for the attributes in a model.
      * If the form name is "A" and an attribute name is "b", then the corresponding input name would be "A[b]".
      * If the form name is an empty string, then the input name would be "b".
      *
@@ -40,11 +60,6 @@ interface FormModelInterface extends FormMetadataInterface, PostValidationHookIn
      * {@see load()}
      */
     public function getFormName(): string;
-
-    /**
-     * @return FormErrorsInterface Validation errors.
-     */
-    public function getFormErrors(): FormErrorsInterface;
 
     /**
      * Returns the validation rules for attributes.
@@ -109,6 +124,8 @@ interface FormModelInterface extends FormMetadataInterface, PostValidationHookIn
      * @param string|null $formName scope from which to get data
      *
      * @return bool whether `load()` found the expected form in `$data`.
+     *
+     * @psalm-param array<string, string> $data
      */
     public function load(array $data, ?string $formName = null): bool;
 
@@ -119,4 +136,9 @@ interface FormModelInterface extends FormMetadataInterface, PostValidationHookIn
      * @param mixed $value
      */
     public function setAttribute(string $name, mixed $value): void;
+
+    /**
+     * Set custom form errors instance.
+     */
+    public function setFormErrors(FormErrorsContract $formErrors): void;
 }

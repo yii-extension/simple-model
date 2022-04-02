@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\Simple\Model;
+namespace Yii\Extension\FormModel\Contract;
 
 /**
- * ModelError represents a form errors collection.
+ * FormErrors represents a form errors collection.
  */
-interface FormErrorsInterface
+interface FormErrorsContract
 {
     /**
      * Add an error for the specified attribute.
@@ -18,20 +18,11 @@ interface FormErrorsInterface
     public function addError(string $attribute, string $error): void;
 
     /**
-     * Add all errors from the specified collection.
-     *
-     * @param array $items Errors collection.
-     *
-     * @psalm-param array<string, array<array-key, string>> $items
-     */
-    public function addErrors(array $items): void;
-
-    /**
-     * Removes errors for the specified attribute or all attributes.
+     * Removes error for attributes.
      *
      * @param string $attribute Attribute name.
      */
-    public function clear(string $attribute = null): void;
+    public function clear(string $attribute): void;
 
     /**
      * Returns errors for all attributes.
@@ -73,12 +64,14 @@ interface FormErrorsInterface
     /**
      * Returns errors for all attributes as a one-dimensional array.
      *
+     * @param array $onlyAttributes List of attributes to return errors.
+     *
      * @return array errors for all attributes as a one-dimensional array. Empty array is returned if no error.
      *
      * {@see getErrors()}
      * {@see getFirstErrors(){}
      */
-    public function getErrorSummary(): array;
+    public function getErrorSummary(array $onlyAttributes): array;
 
     /**
      * Returns the first error of every attribute in the collection.
