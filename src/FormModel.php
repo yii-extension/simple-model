@@ -57,7 +57,13 @@ abstract class FormModel implements FormModelContract, PostValidationHookInterfa
         $hints = $this->getHints();
         $hint = $hints[$attribute] ?? '';
         $nestedHint = $this->getNestedValue('getHint', $attribute);
-        return $nestedHint !== '' ? $nestedHint : $hint;
+
+        $hint = match ($this->has($attribute)) {
+            true => $nestedHint === '' ? $hint : $nestedHint,
+            false => throw new InvalidArgumentException("Attribute '$attribute' does not exist."),
+        };
+
+        return $hint;
     }
 
     /**
@@ -93,9 +99,15 @@ abstract class FormModel implements FormModelContract, PostValidationHookInterfa
     public function getPlaceholder(string $attribute): string
     {
         $placeHolders = $this->getPlaceholders();
-        $placeholder = $placeHolders[$attribute] ?? '';
+        $placeHolder = $placeHolders[$attribute] ?? '';
         $nestedPlaceholder = $this->getNestedValue('getPlaceholder', $attribute);
-        return $nestedPlaceholder !== '' ? $nestedPlaceholder : $placeholder;
+
+        $placeHolder = match ($this->has($attribute)) {
+            true => $nestedPlaceholder === '' ? $placeHolder : $nestedPlaceholder,
+            false => throw new InvalidArgumentException("Attribute '$attribute' does not exist."),
+        };
+
+        return $placeHolder;
     }
 
     /**

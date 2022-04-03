@@ -53,7 +53,14 @@ final class FormModelAttributesTest extends TestCase
         $formModel = new Login();
         $this->assertSame('Write your id or email.', $formModel->getHint('login'));
         $this->assertSame('Write your password.', $formModel->getHint('password'));
-        $this->assertEmpty($formModel->getHint('noExist'));
+    }
+
+    public function testGetHintException(): void
+    {
+        $formModel = new Login();
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Attribute 'noExist' does not exist.");
+        $formModel->getHint('noExist');
     }
 
     public function testGetHints(): void
@@ -71,7 +78,6 @@ final class FormModelAttributesTest extends TestCase
     public function testGetLabelException(): void
     {
         $formModel = new Login();
-
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Attribute 'noExist' does not exist.");
         $formModel->getLabel('noExist');
@@ -88,7 +94,14 @@ final class FormModelAttributesTest extends TestCase
         $formModel = new Login();
         $this->assertSame('Type Username or Email.', $formModel->getPlaceHolder('login'));
         $this->assertSame('Type Password.', $formModel->getPlaceHolder('password'));
-        $this->assertEmpty($formModel->getPlaceHolder('noExist'));
+    }
+
+    public function testGetPlaceException(): void
+    {
+        $formModel = new Login();
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Attribute 'noExist' does not exist.");
+        $formModel->getPlaceHolder('noExist');
     }
 
     public function testGetPlaceHolders(): void
@@ -185,7 +198,6 @@ final class FormModelAttributesTest extends TestCase
     public function testSetsException(): void
     {
         $formModel = new Type();
-
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Attribute "noExist" does not exist');
         $formModel->sets(['noExist' => []]);

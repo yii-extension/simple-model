@@ -39,7 +39,6 @@ final class FormModelNestedTest extends TestCase
     {
         $formModel = new Nested();
         $this->assertSame('Write your id or email.', $formModel->getHint('user.login'));
-        $this->assertEmpty($formModel->getHint('noExist'));
     }
 
     public function testGetLabel(): void
