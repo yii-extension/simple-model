@@ -17,9 +17,9 @@ interface FormErrorsContract
     /**
      * Removes error for attributes.
      *
-     * @param string $attribute Attribute name.
+     * @param string|null $attribute Attribute name.
      */
-    public function clear(string $attribute): void;
+    public function clear(?string $attribute = null): void;
 
     /**
      * Returns errors for an attribute with a given name.

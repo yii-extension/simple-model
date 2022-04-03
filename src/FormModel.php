@@ -165,6 +165,8 @@ abstract class FormModel implements FormModelContract
      */
     public function load(array $data, ?string $formName = null): bool
     {
+        $this->error()->clear();
+
         $this->rawData = [];
         $scope = $formName ?? $this->getFormName();
 
