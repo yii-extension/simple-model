@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yii\Extension\FormModel\Validator;
 
 use Yii\Extension\FormModel\Contract\FormModelContract;
+use Yiisoft\Validator\DataSet\AttributeDataSet;
 use Yiisoft\Validator\Result;
 use Yiisoft\Validator\Rule;
 use Yiisoft\Validator\RuleSet;
@@ -27,6 +28,34 @@ final class Validator
         $context = new ValidationContext($this->formModel);
         $result = new Result();
         $rules = $this->formModel->getRules();
+
+        /** @psalm-var iterable<string, Rule[]> $rules */
+        foreach ($rules as $attribute => $attributeRules) {
+            $ruleSet = new RuleSet($attributeRules);
+            $tempResult = $ruleSet->validate(
+                $this->formModel->getAttributeValue($attribute),
+                $context->withAttribute($attribute)
+            );
+
+            foreach ($tempResult->getErrors() as $error) {
+                $result->addError($error->getMessage(), [$attribute, ...$error->getValuePath()]);
+            }
+        }
+
+        foreach ($result->getErrorMessagesIndexedByAttribute() as $attribute => $errors) {
+            if ($this->formModel->has($attribute)) {
+                $this->addError([$attribute => $errors]);
+            }
+        }
+
+        return $result;
+    }
+
+    public function validateWithAttributes(AttributeDataSet $attributeDataSet): Result
+    {
+        $context = new ValidationContext($this->formModel);
+        $result = new Result();
+        $rules = $attributeDataSet->getRules();
 
         /** @psalm-var iterable<string, Rule[]> $rules */
         foreach ($rules as $attribute => $attributeRules) {

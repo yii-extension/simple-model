@@ -104,4 +104,14 @@ interface FormModelContract extends FormAttributesContract
      * Set custom form errors instance.
      */
     public function setFormErrors(FormErrorsContract $formErrors): void;
+
+    /**
+     * Validate the FormModel instance.
+     */
+    public function validate(): bool;
+
+    /**
+     * Validate the FormModel instance with attibutes.
+     */
+    public function validateWithAttributes(): bool;
 }

@@ -13,6 +13,7 @@ use Yii\Extension\FormModel\Contract\FormModelContract;
 use Yii\Extension\FormModel\Validator\Validator;
 use Yiisoft\Strings\Inflector;
 use Yiisoft\Strings\StringHelper;
+use Yiisoft\Validator\DataSet\AttributeDataSet;
 use Yiisoft\Validator\Result;
 
 use function array_key_exists;
@@ -224,6 +225,12 @@ abstract class FormModel implements FormModelContract
     public function validate(): bool
     {
         return (new Validator($this))->validate()->isValid();
+    }
+
+    public function validateWithAttributes(): bool
+    {
+        $attributeDataSet = new AttributeDataSet($this, $this->rawData);
+        return (new Validator($this))->validateWithAttributes($attributeDataSet)->isValid();
     }
 
     /**
