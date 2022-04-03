@@ -10,11 +10,10 @@ use ReflectionClass;
 use ReflectionNamedType;
 use Yii\Extension\FormModel\Contract\FormErrorsContract;
 use Yii\Extension\FormModel\Contract\FormModelContract;
+use Yii\Extension\FormModel\Validator\Validator;
 use Yiisoft\Strings\Inflector;
 use Yiisoft\Strings\StringHelper;
-use Yiisoft\Validator\PostValidationHookInterface;
 use Yiisoft\Validator\Result;
-use Yiisoft\Validator\RulesProviderInterface;
 
 use function array_key_exists;
 use function array_keys;
@@ -25,14 +24,13 @@ use function str_contains;
 use function strrchr;
 use function substr;
 
-abstract class FormModel implements FormModelContract, PostValidationHookInterface, RulesProviderInterface
+abstract class FormModel implements FormModelContract
 {
     private array $attributes;
     private ?FormErrorsContract $formErrors = null;
     private ?Inflector $inflector = null;
     /** @psalm-var array<string, string|array> */
     private array $rawData = [];
-    private bool $validated = false;
 
     public function __construct()
     {
@@ -50,6 +48,33 @@ abstract class FormModel implements FormModelContract, PostValidationHookInterfa
             true => $this->formErrors = new FormErrors(),
             false => $this->formErrors,
         };
+    }
+
+    public function getAttributeValue(string $attribute): mixed
+    {
+        return $this->rawData[$attribute] ?? $this->getCastValue($attribute);
+    }
+
+    public function getCastValue(string $attribute): mixed
+    {
+        return $this->readProperty($attribute);
+    }
+
+    /**
+     * @return string Returns classname without a namespace part or empty string when class is anonymous
+     */
+    public function getFormName(): string
+    {
+        if (str_contains(static::class, '@anonymous')) {
+            return '';
+        }
+
+        $className = strrchr(static::class, '\\');
+        if ($className === false) {
+            return static::class;
+        }
+
+        return substr($className, 1);
     }
 
     public function getHint(string $attribute): string
@@ -118,31 +143,9 @@ abstract class FormModel implements FormModelContract, PostValidationHookInterfa
         return [];
     }
 
-    public function getCastValue(string $attribute): mixed
+    public function getRules(): array
     {
-        return $this->readProperty($attribute);
-    }
-
-    public function getAttributeValue(string $attribute): mixed
-    {
-        return $this->rawData[$attribute] ?? $this->getCastValue($attribute);
-    }
-
-    /**
-     * @return string Returns classname without a namespace part or empty string when class is anonymous
-     */
-    public function getFormName(): string
-    {
-        if (str_contains(static::class, '@anonymous')) {
-            return '';
-        }
-
-        $className = strrchr(static::class, '\\');
-        if ($className === false) {
-            return static::class;
-        }
-
-        return substr($className, 1);
+        return [];
     }
 
     public function has(string $attribute): bool
@@ -196,6 +199,11 @@ abstract class FormModel implements FormModelContract, PostValidationHookInterfa
         }
     }
 
+    public function setFormErrors(FormErrorsContract $formErrors): void
+    {
+        $this->formErrors = $formErrors;
+    }
+
     public function sets(array $data): void
     {
         /**
@@ -213,25 +221,9 @@ abstract class FormModel implements FormModelContract, PostValidationHookInterfa
         }
     }
 
-    public function processValidationResult(Result $result): void
+    public function validate(): bool
     {
-        foreach ($result->getErrorMessagesIndexedByAttribute() as $attribute => $errors) {
-            if ($this->has($attribute)) {
-                $this->addErrors([$attribute => $errors]);
-            }
-        }
-
-        $this->validated = true;
-    }
-
-    public function getRules(): array
-    {
-        return [];
-    }
-
-    public function setFormErrors(FormErrorsContract $formErrors): void
-    {
-        $this->formErrors = $formErrors;
+        return (new Validator($this))->validate()->isValid();
     }
 
     /**
@@ -258,26 +250,6 @@ abstract class FormModel implements FormModelContract, PostValidationHookInterfa
     }
 
     /**
-     * @psalm-param  non-empty-array<string, non-empty-list<string>> $items
-     */
-    private function addErrors(array $items): void
-    {
-        foreach ($items as $attribute => $errors) {
-            foreach ($errors as $error) {
-                $this->error()->add($attribute, $error);
-            }
-        }
-    }
-
-    private function getInflector(): Inflector
-    {
-        return match (empty($this->inflector)) {
-            true => $this->inflector = new Inflector(),
-            false => $this->inflector,
-        };
-    }
-
-    /**
      * Generates a user-friendly attribute label based on the give attribute name.
      *
      * This is done by replacing underscores, dashes and dots with blanks and changing the first letter of each word to
@@ -296,46 +268,12 @@ abstract class FormModel implements FormModelContract, PostValidationHookInterfa
         );
     }
 
-    private function readProperty(string $attribute): mixed
+    private function getInflector(): Inflector
     {
-        $class = static::class;
-
-        [$attribute, $nested] = $this->getNested($attribute);
-
-        if (!property_exists($class, $attribute)) {
-            throw new InvalidArgumentException("Undefined property: \"$class::$attribute\".");
-        }
-
-        /** @psalm-suppress MixedMethodCall */
-        $getter = static function (FormModelContract $class, string $attribute, ?string $nested): mixed {
-            return match ($nested) {
-                null => $class->$attribute,
-                default => $class->$attribute->getCastValue($nested),
-            };
+        return match (empty($this->inflector)) {
+            true => $this->inflector = new Inflector(),
+            false => $this->inflector,
         };
-
-        $getter = Closure::bind($getter, null, $this);
-
-        /** @var Closure $getter */
-        return $getter($this, $attribute, $nested);
-    }
-
-    private function writeProperty(string $attribute, mixed $value): void
-    {
-        [$attribute, $nested] = $this->getNested($attribute);
-
-        /** @psalm-suppress MixedMethodCall */
-        $setter = static function (FormModelContract $class, string $attribute, mixed $value, ?string $nested): void {
-            match ($nested) {
-                null => $class->$attribute = $value,
-                default => $class->$attribute->set($nested, $value),
-            };
-        };
-
-        $setter = Closure::bind($setter, null, $this);
-
-        /** @var Closure $setter */
-        $setter($this, $attribute, $value, $nested);
     }
 
     /**
@@ -381,8 +319,45 @@ abstract class FormModel implements FormModelContract, PostValidationHookInterfa
         return $result;
     }
 
-    public function isValidated(): bool
+    private function readProperty(string $attribute): mixed
     {
-        return $this->validated;
+        $class = static::class;
+
+        [$attribute, $nested] = $this->getNested($attribute);
+
+        if (!property_exists($class, $attribute)) {
+            throw new InvalidArgumentException("Undefined property: \"$class::$attribute\".");
+        }
+
+        /** @psalm-suppress MixedMethodCall */
+        $getter = static function (FormModelContract $class, string $attribute, ?string $nested): mixed {
+            return match ($nested) {
+                null => $class->$attribute,
+                default => $class->$attribute->getCastValue($nested),
+            };
+        };
+
+        $getter = Closure::bind($getter, null, $this);
+
+        /** @var Closure $getter */
+        return $getter($this, $attribute, $nested);
+    }
+
+    private function writeProperty(string $attribute, mixed $value): void
+    {
+        [$attribute, $nested] = $this->getNested($attribute);
+
+        /** @psalm-suppress MixedMethodCall */
+        $setter = static function (FormModelContract $class, string $attribute, mixed $value, ?string $nested): void {
+            match ($nested) {
+                null => $class->$attribute = $value,
+                default => $class->$attribute->set($nested, $value),
+            };
+        };
+
+        $setter = Closure::bind($setter, null, $this);
+
+        /** @var Closure $setter */
+        $setter($this, $attribute, $value, $nested);
     }
 }

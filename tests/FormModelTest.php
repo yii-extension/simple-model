@@ -50,12 +50,6 @@ final class FormModelTest extends TestCase
         $this->assertSame([], $formModel->getRules());
     }
 
-    public function testIsValidated(): void
-    {
-        $formModel = new Stub();
-        $this->assertSame(false, $formModel->isValidated());
-    }
-
     public function testLoad(): void
     {
         $formModel = new Login();

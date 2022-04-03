@@ -27,9 +27,8 @@ final class FormErrorsAttributesTest extends TestCase
     public function testClearAllErrors(): void
     {
         $formModel = new Login();
-        $validator = $this->createValidator();
         $this->assertTrue($formModel->load($this->data));
-        $this->assertFalse($validator->validate($formModel)->isValid());
+        $this->assertFalse($formModel->validate());
         $this->assertSame($this->expected, FormErrorsAttributes::getAll($formModel));
         $this->assertEmpty($formModel->error()->clear());
     }
@@ -37,9 +36,8 @@ final class FormErrorsAttributesTest extends TestCase
     public function testClearForAttribute(): void
     {
         $formModel = new Login();
-        $validator = $this->createValidator();
         $this->assertTrue($formModel->load($this->data));
-        $this->assertFalse($validator->validate($formModel)->isValid());
+        $this->assertFalse($formModel->validate());
         $this->assertSame($this->expected, FormErrorsAttributes::getAll($formModel));
         $this->assertEmpty($formModel->error()->clear('login'));
         $this->assertSame(['password' => ['Is too short.']], FormErrorsAttributes::getAll($formModel));
@@ -48,9 +46,8 @@ final class FormErrorsAttributesTest extends TestCase
     public function testGet(): void
     {
         $formModel = new Login();
-        $validator = $this->createValidator();
         $this->assertTrue($formModel->load($this->data));
-        $this->assertFalse($validator->validate($formModel)->isValid());
+        $this->assertFalse($formModel->validate());
         $this->assertSame(
             ['This value is not a valid email address.'],
             FormErrorsAttributes::get($formModel, 'login')
@@ -60,18 +57,16 @@ final class FormErrorsAttributesTest extends TestCase
     public function testGetAll(): void
     {
         $formModel = new Login();
-        $validator = $this->createValidator();
         $this->assertTrue($formModel->load($this->data));
-        $this->assertFalse($validator->validate($formModel)->isValid());
+        $this->assertFalse($formModel->validate());
         $this->assertSame($this->expected, FormErrorsAttributes::getAll($formModel));
     }
 
     public function testGetFirst(): void
     {
         $formModel = new Login();
-        $validator = $this->createValidator();
         $this->assertTrue($formModel->load($this->data));
-        $this->assertFalse($validator->validate($formModel)->isValid());
+        $this->assertFalse($formModel->validate());
         $this->assertSame(
             'This value is not a valid email address.',
             FormErrorsAttributes::getFirst($formModel, 'login'),
@@ -93,9 +88,8 @@ final class FormErrorsAttributesTest extends TestCase
     public function testGetSummary(): void
     {
         $formModel = new Login();
-        $validator = $this->createValidator();
         $this->assertTrue($formModel->load($this->data));
-        $this->assertFalse($validator->validate($formModel)->isValid());
+        $this->assertFalse($formModel->validate());
         $this->assertSame(
             ['This value is not a valid email address.', 'Is too short.'],
             FormErrorsAttributes::getSummary($formModel),
@@ -105,9 +99,8 @@ final class FormErrorsAttributesTest extends TestCase
     public function testGetSummaryFirst(): void
     {
         $formModel = new Login();
-        $validator = $this->createValidator();
         $this->assertTrue($formModel->load($this->data));
-        $this->assertFalse($validator->validate($formModel)->isValid());
+        $this->assertFalse($formModel->validate());
         $this->assertSame(
             ['login' => 'This value is not a valid email address.', 'password' => 'Is too short.'],
             FormErrorsAttributes::getSummaryFirst($formModel),
@@ -117,9 +110,8 @@ final class FormErrorsAttributesTest extends TestCase
     public function testGetSummaryOnlyAttributes(): void
     {
         $formModel = new Login();
-        $validator = $this->createValidator();
         $this->assertTrue($formModel->load($this->data));
-        $this->assertFalse($validator->validate($formModel)->isValid());
+        $this->assertFalse($formModel->validate());
         $this->assertSame(
             ['This value is not a valid email address.'],
             FormErrorsAttributes::getSummary($formModel, ['login']),
@@ -133,9 +125,8 @@ final class FormErrorsAttributesTest extends TestCase
     public function testHas(): void
     {
         $formModel = new Login();
-        $validator = $this->createValidator();
         $this->assertTrue($formModel->load($this->data));
-        $this->assertFalse($validator->validate($formModel)->isValid());
+        $this->assertFalse($formModel->validate());
         $this->assertTrue(FormErrorsAttributes::has($formModel));
     }
 }

@@ -66,13 +66,6 @@ interface FormModelContract extends FormAttributesContract
     public function getRules(): array;
 
     /**
-     * This method allows knowing if the validation was executed or not in the model.
-     *
-     * @return bool If the model was validated.
-     */
-    public function isValidated(): bool;
-
-    /**
      * Populates the model with input data.
      *
      * which, with `load()` can be written as:
