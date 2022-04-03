@@ -2,30 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\Simple\Model;
+namespace Yii\Extension\FormModel\Contract;
 
-use Yiisoft\Validator\PostValidationHookInterface;
-use Yiisoft\Validator\RulesProviderInterface;
-
-/**
- * ModelInterface model represents an HTML form: its data, validation and presentation.
- */
-interface FormModelInterface extends FormMetadataInterface, PostValidationHookInterface, RulesProviderInterface
+interface FormModelContract extends FormAttributesContract
 {
     /**
-     * Returns the value for the specified attribute.
-     *
-     * @param string $attribute
-     *
-     * @return array|object|string|bool|int|float|null
+     * @return FormErrorsContract Validation errors.
      */
-    public function getAttributeValue(string $attribute): array|object|string|bool|int|float|null;
+    public function error(): FormErrorsContract;
 
     /**
      * Returns the form name that this model class should use.
      *
-     * The form name is mainly used by {@see \Yii\Extension\Simple\Model\Helper\HtmlForm} to determine how to name the
-     * input fields for the attributes in a model.
+     * The form name is mainly used by {@see \Yiisoft\Form\Helper\HtmlForm} to determine how to name the input
+     * fields for the attributes in a model.
      * If the form name is "A" and an attribute name is "b", then the corresponding input name would be "A[b]".
      * If the form name is an empty string, then the input name would be "b".
      *
@@ -40,11 +30,6 @@ interface FormModelInterface extends FormMetadataInterface, PostValidationHookIn
      * {@see load()}
      */
     public function getFormName(): string;
-
-    /**
-     * @return FormErrorsInterface Validation errors.
-     */
-    public function getFormErrors(): FormErrorsInterface;
 
     /**
      * Returns the validation rules for attributes.
@@ -81,13 +66,6 @@ interface FormModelInterface extends FormMetadataInterface, PostValidationHookIn
     public function getRules(): array;
 
     /**
-     * This method allows knowing if the validation was executed or not in the model.
-     *
-     * @return bool If the model was validated.
-     */
-    public function isValidated(): bool;
-
-    /**
      * Populates the model with input data.
      *
      * which, with `load()` can be written as:
@@ -109,6 +87,8 @@ interface FormModelInterface extends FormMetadataInterface, PostValidationHookIn
      * @param string|null $formName scope from which to get data
      *
      * @return bool whether `load()` found the expected form in `$data`.
+     *
+     * @psalm-param array<string, string> $data
      */
     public function load(array $data, ?string $formName = null): bool;
 
@@ -118,5 +98,20 @@ interface FormModelInterface extends FormMetadataInterface, PostValidationHookIn
      * @param string $name of the attribute to set
      * @param mixed $value
      */
-    public function setAttribute(string $name, mixed $value): void;
+    public function set(string $name, mixed $value): void;
+
+    /**
+     * Set custom form errors instance.
+     */
+    public function setFormErrors(FormErrorsContract $formErrors): void;
+
+    /**
+     * Validate the FormModel instance.
+     */
+    public function validate(): bool;
+
+    /**
+     * Validate the FormModel instance with attibutes.
+     */
+    public function validateWithAttributes(): bool;
 }

@@ -2,20 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\Simple\Model\Tests\TestSupport;
+namespace Yii\Extension\FormModel\Tests\TestSupport;
 
 use ReflectionException;
 use ReflectionObject;
-use Yiisoft\Validator\Formatter;
-use Yiisoft\Validator\Validator;
 
 trait TestTrait
 {
-    protected function createValidator(): Validator
-    {
-        return new Validator(new Formatter());
-    }
-
     /**
      * Invokes a inaccessible method.
      *
@@ -31,11 +24,8 @@ trait TestTrait
     protected function invokeMethod(object $object, string $method, array $args = [], bool $revoke = true): mixed
     {
         $reflection = new ReflectionObject($object);
-
         $method = $reflection->getMethod($method);
-
         $method->setAccessible(true);
-
         $result = $method->invokeArgs($object, $args);
 
         if ($revoke) {

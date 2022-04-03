@@ -2,16 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\FormModel;
+namespace Yii\Extension\FormModel\Tests\TestSupport\Error;
 
 use Yii\Extension\FormModel\Contract\FormErrorsContract;
 
-use function array_flip;
-use function array_intersect_key;
-use function array_merge;
-use function reset;
-
-final class FormErrors implements FormErrorsContract
+final class CustomFormErrors implements FormErrorsContract
 {
     /** @psalm-param array<string, array<array-key, string>> $attributesErrors */
     public function __construct(private array $attributesErrors = [])

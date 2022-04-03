@@ -2,25 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\Simple\Model\Tests\FormModel;
+namespace Yii\Extension\FormModel\Tests\TestSupport\FormModel;
 
-use Yii\Extension\Simple\Model\FormModel;
+use Yii\Extension\FormModel\FormModel;
 use Yiisoft\Validator\Rule\Email;
 use Yiisoft\Validator\Rule\HasLength;
 use Yiisoft\Validator\Rule\Required;
 
 final class Login extends FormModel
 {
-    public string $name = '';
-    private string $lastName = '';
     private ?string $login = null;
     private ?string $password = null;
     private bool $rememberMe = false;
-
-    public function getLastName(): string
-    {
-        return $this->lastName;
-    }
 
     public function getLogin(): ?string
     {
@@ -52,7 +45,12 @@ final class Login extends FormModel
         $this->rememberMe = $value;
     }
 
-    public function getAttributeHints(): array
+    public function getFormName(): string
+    {
+        return 'Login';
+    }
+
+    public function getHints(): array
     {
         return [
             'login' => 'Write your id or email.',
@@ -60,7 +58,7 @@ final class Login extends FormModel
         ];
     }
 
-    public function getAttributeLabels(): array
+    public function getLabels(): array
     {
         return [
             'login' => 'Login:',
@@ -69,17 +67,12 @@ final class Login extends FormModel
         ];
     }
 
-    public function getAttributePlaceholders(): array
+    public function getPlaceholders(): array
     {
         return [
             'login' => 'Type Username or Email.',
             'password' => 'Type Password.',
         ];
-    }
-
-    public function getFormName(): string
-    {
-        return 'Login';
     }
 
     public function getRules(): array
@@ -93,17 +86,17 @@ final class Login extends FormModel
     private function loginRules(): array
     {
         return [
-            Required::rule(),
-            HasLength::rule()->min(4)->max(40)->tooShortMessage('Is too short.')->tooLongMessage('Is too long.'),
-            Email::rule(),
+            new Required(),
+            new HasLength(min: 4, max: 40, tooShortMessage: 'Is too short.', tooLongMessage: 'Is too long.'),
+            new Email(),
         ];
     }
 
     private function passwordRules(): array
     {
         return [
-            Required::rule(),
-            HasLength::rule()->min(8)->tooShortMessage('Is too short.'),
+            new Required(),
+            new HasLength(min: 8, tooShortMessage: 'Is too short.'),
         ];
     }
 }

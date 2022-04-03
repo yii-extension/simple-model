@@ -2,103 +2,60 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\Simple\Model;
+namespace Yii\Extension\FormModel;
 
 use Closure;
 use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionNamedType;
-use Stringable;
+use Yii\Extension\FormModel\Contract\FormErrorsContract;
+use Yii\Extension\FormModel\Contract\FormModelContract;
+use Yii\Extension\FormModel\FormValidator;
 use Yiisoft\Strings\Inflector;
 use Yiisoft\Strings\StringHelper;
-use Yiisoft\Validator\ResultSet;
+use Yiisoft\Validator\Result;
 
 use function array_key_exists;
+use function array_keys;
 use function explode;
 use function is_subclass_of;
-use function sprintf;
+use function property_exists;
 use function str_contains;
+use function strrchr;
+use function substr;
 
-/**
- * FormModel represents an `HTML` form: its data, validation and presentation.
- */
-abstract class FormModel implements FormModelInterface
+abstract class FormModel implements FormModelContract
 {
-    protected string $formErrorsClass = FormErrors::class;
     private array $attributes;
-    private FormErrorsInterface $formErrors;
-    private Inflector $inflector;
-    private bool $validated = false;
+    private ?FormErrorsContract $formErrors = null;
+    private ?Inflector $inflector = null;
+    /** @psalm-var array<string, string|array> */
+    private array $rawData = [];
 
     public function __construct()
     {
         $this->attributes = $this->collectAttributes();
-        $this->inflector = new Inflector();
-        $this->formErrors = $this->createFormErrors($this->formErrorsClass);
     }
 
-    public function getAttributeHint(string $attribute): string
+    public function attributes(): array
     {
-        $attributeHints = $this->getAttributeHints();
-        $hint = $attributeHints[$attribute] ?? '';
-        $nestedAttributeHint = $this->getNestedAttributeValue('getAttributeHint', $attribute);
-
-        return $nestedAttributeHint !== '' ? $nestedAttributeHint : $hint;
+        return array_keys($this->attributes);
     }
 
-    /**
-     * @return string[]
-     */
-    public function getAttributeHints(): array
+    public function error(): FormErrorsContract
     {
-        return [];
+        return match (empty($this->formErrors)) {
+            true => $this->formErrors = new FormErrors(),
+            false => $this->formErrors,
+        };
     }
 
-    public function getAttributeLabel(string $attribute): string
+    public function getAttributeValue(string $attribute): mixed
     {
-        $label = $this->generateAttributeLabel($attribute);
-        $labels = $this->getAttributeLabels();
-
-        if (array_key_exists($attribute, $labels)) {
-            $label = $labels[$attribute];
-        }
-
-        $nestedAttributeLabel = $this->getNestedAttributeValue('getAttributeLabel', $attribute);
-
-        return $nestedAttributeLabel !== '' ? $nestedAttributeLabel : $label;
+        return $this->rawData[$attribute] ?? $this->getCastValue($attribute);
     }
 
-    /**
-     * @return string[]
-     */
-    public function getAttributeLabels(): array
-    {
-        return [];
-    }
-
-    public function getAttributePlaceholder(string $attribute): string
-    {
-        $attributePlaceHolders = $this->getAttributePlaceholders();
-        $placeholder = $attributePlaceHolders[$attribute] ?? '';
-        $nestedAttributePlaceholder = $this->getNestedAttributeValue('getAttributePlaceholder', $attribute);
-
-        return $nestedAttributePlaceholder !== '' ? $nestedAttributePlaceholder : $placeholder;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getAttributePlaceholders(): array
-    {
-        return [];
-    }
-
-    /**
-     * @param string $attribute
-     *
-     * @return array|object|string|bool|int|float|null
-     */
-    public function getAttributeValue(string $attribute): array|object|string|bool|int|float|null
+    public function getCastValue(string $attribute): mixed
     {
         return $this->readProperty($attribute);
     }
@@ -120,106 +77,70 @@ abstract class FormModel implements FormModelInterface
         return substr($className, 1);
     }
 
-    public function hasAttribute(string $attribute): bool
+    public function getHint(string $attribute): string
     {
-        return array_key_exists($attribute, $this->attributes);
+        $hints = $this->getHints();
+        $hint = $hints[$attribute] ?? '';
+        $nestedHint = $this->getNestedValue('getHint', $attribute);
+
+        $hint = match ($this->has($attribute)) {
+            true => $nestedHint === '' ? $hint : $nestedHint,
+            false => throw new InvalidArgumentException("Attribute '$attribute' does not exist."),
+        };
+
+        return $hint;
     }
 
     /**
-     * @return FormErrorsInterface Get FormErrors object.
+     * @return string[]
      */
-    public function getFormErrors(): FormErrorsInterface
+    public function getHints(): array
     {
-        return $this->formErrors;
+        return [];
+    }
+
+    public function getLabel(string $attribute): string
+    {
+        $labels = $this->getLabels();
+        $label = $labels[$attribute] ?? $this->generateLabel($attribute);
+        $nestedLabel = $this->getNestedValue('getLabel', $attribute);
+
+        $label = match ($this->has($attribute)) {
+            true => $nestedLabel === '' ? $label : $nestedLabel,
+            false => throw new InvalidArgumentException("Attribute '$attribute' does not exist."),
+        };
+
+        return $label;
     }
 
     /**
-     * @param array $data
-     * @param string|null $formName
-     *
-     * @return bool
+     * @return string[]
      */
-    public function load(array $data, ?string $formName = null): bool
+    public function getLabels(): array
     {
-        $scope = $formName ?? $this->getFormName();
+        return [];
+    }
 
-        /**
-         * @psalm-var array<string, scalar|Stringable|null>
-         */
-        $values = [];
+    public function getPlaceholder(string $attribute): string
+    {
+        $placeHolders = $this->getPlaceholders();
+        $placeHolder = $placeHolders[$attribute] ?? '';
+        $nestedPlaceholder = $this->getNestedValue('getPlaceholder', $attribute);
 
-        if ($scope === '' && !empty($data)) {
-            $values = $data;
-        } elseif (isset($data[$scope])) {
-            /** @var mixed */
-            $values = $data[$scope];
-        }
+        $placeHolder = match ($this->has($attribute)) {
+            true => $nestedPlaceholder === '' ? $placeHolder : $nestedPlaceholder,
+            false => throw new InvalidArgumentException("Attribute '$attribute' does not exist."),
+        };
 
-        /** @var array<string, scalar|Stringable|null> $values */
-        foreach ($values as $name => $value) {
-            $this->setAttribute($name, $value);
-        }
-
-        return $values !== [];
+        return $placeHolder;
     }
 
     /**
-     * @param string $name
-     * @param mixed $value
+     * @return string[]
      */
-    public function setAttribute(string $name, mixed $value): void
+    public function getPlaceholders(): array
     {
-        [$realName] = $this->getNestedAttribute($name);
-
-        if (isset($this->attributes[$realName])) {
-            switch ($this->attributes[$realName]) {
-                case 'bool':
-                    $this->writeProperty($name, (bool) $value);
-                    break;
-                case 'float':
-                    $this->writeProperty($name, (float) $value);
-                    break;
-                case 'int':
-                    $this->writeProperty($name, (int) $value);
-                    break;
-                case 'string':
-                    $this->writeProperty($name, (string) $value);
-                    break;
-                default:
-                    $this->writeProperty($name, $value);
-                    break;
-            }
-        }
-    }
-
-    public function setAttributes(array $data): void
-    {
-        /** @var array<string, null|scalar|object|Stringable> $data */
-        foreach ($data as $name => $value) {
-            $name = $this->inflector->toCamelCase($name);
-
-            if ($this->hasAttribute($name)) {
-                $this->setAttribute($name, $value);
-            } else {
-                throw new InvalidArgumentException(sprintf('Attribute "%s" does not exist', $name));
-            }
-        }
-    }
-
-    public function processValidationResult(ResultSet $resultSet): void
-    {
-        $this->validated = false;
-
-        /** @var array<string, Resultset> $resultSet */
-        foreach ($resultSet as $attribute => $result) {
-            if ($result->isValid() === false) {
-                $this->formErrors->clear($attribute);
-                /** @psalm-suppress InvalidArgument */
-                $this->addErrors([$attribute => $result->getErrors()]);
-            }
-        }
-
-        $this->validated = true;
+        return [];
     }
 
     public function getRules(): array
@@ -227,9 +148,89 @@ abstract class FormModel implements FormModelInterface
         return [];
     }
 
-    public function isValidated(): bool
+    public function has(string $attribute): bool
     {
-        return $this->validated;
+        [$attribute, $nested] = $this->getNested($attribute);
+
+        return $nested !== null || array_key_exists($attribute, $this->attributes);
+    }
+
+    /**
+     * @param array $data
+     * @param string|null $formName
+     *
+     * @return bool
+     *
+     * @psalm-param array<string, string|array> $data
+     */
+    public function load(array $data, ?string $formName = null): bool
+    {
+        $this->error()->clear();
+
+        $this->rawData = [];
+        $scope = $formName ?? $this->getFormName();
+
+        /** @psalm-var array<string, string> */
+        $this->rawData = match (empty($scope)) {
+            true => $data,
+            false => isset($data[$scope]) ? $data[$scope] : [],
+        };
+
+        foreach ($this->rawData as $name => $value) {
+            $this->set($name, $value);
+        }
+
+        return $this->rawData !== [];
+    }
+
+    public function set(string $name, mixed $value): void
+    {
+        [$realName] = $this->getNested($name);
+
+        if (isset($this->attributes[$realName])) {
+            /** @var mixed */
+            $value = match ($this->attributes[$realName]) {
+                'bool' => (bool) $value,
+                'float' => (float) $value,
+                'int' => (int) $value,
+                'string' => (string) $value,
+                default => $value,
+            };
+
+            $this->writeProperty($name, $value);
+        }
+    }
+
+    public function setFormErrors(FormErrorsContract $formErrors): void
+    {
+        $this->formErrors = $formErrors;
+    }
+
+    public function sets(array $data): void
+    {
+        /**
+         * @var array<string, mixed> $data
+         * @var mixed $value
+         */
+        foreach ($data as $name => $value) {
+            $name = $this->getInflector()->toCamelCase($name);
+
+            if ($this->has($name)) {
+                $this->set($name, $value);
+            } else {
+                throw new InvalidArgumentException(sprintf('Attribute "%s" does not exist', $name));
+            }
+        }
+    }
+
+    public function validate(): bool
+    {
+        return (new FormValidator($this))->validate()->isValid();
+    }
+
+    public function validateWithAttributes(): bool
+    {
+        return (new FormValidator($this))->validateWithAttributes($this->rawData)->isValid();
     }
 
     /**
@@ -245,36 +246,14 @@ abstract class FormModel implements FormModelInterface
         $attributes = [];
 
         foreach ($class->getProperties() as $property) {
-            if ($property->isStatic()) {
-                continue;
+            if ($property->isStatic() === false) {
+                /** @var ReflectionNamedType|null $type */
+                $type = $property->getType();
+                $attributes[$property->getName()] = $type !== null ? $type->getName() : '';
             }
-
-            /** @var ReflectionNamedType|null $type */
-            $type = $property->getType();
-
-            $attributes[$property->getName()] = $type !== null ? $type->getName() : '';
         }
 
         return $attributes;
-    }
-
-    /**
-     * @psalm-param array<string, array<array-key, string>> $items
-     */
-    private function addErrors(array $items): void
-    {
-        $this->formErrors->addErrors($items);
-    }
-
-    private function createFormErrors(string $formErrorsClass): FormErrorsInterface
-    {
-        $formErrorsClass = new $formErrorsClass();
-
-        if (!$formErrorsClass instanceof FormErrorsInterface) {
-            throw new InvalidArgumentException('Model errors class must implement ' . FormErrorsInterface::class);
-        }
-
-        return $formErrorsClass;
     }
 
     /**
@@ -289,65 +268,19 @@ abstract class FormModel implements FormModelInterface
      *
      * @return string the attribute label.
      */
-    private function generateAttributeLabel(string $name): string
+    private function generateLabel(string $name): string
     {
         return StringHelper::uppercaseFirstCharacterInEachWord(
-            $this->inflector->toWords($name)
+            $this->getInflector()->toWords($name)
         );
     }
 
-    /**
-     * @param string $attribute
-     *
-     * @return array|object|string|bool|int|float|null
-     *
-     * @psalm-suppress MixedReturnStatement
-     * @psalm-suppress MixedInferredReturnType
-     * @psalm-suppress MissingClosureReturnType
-     */
-    private function readProperty(string $attribute): array|object|string|bool|int|float|null
+    private function getInflector(): Inflector
     {
-        $class = static::class;
-
-        [$attribute, $nested] = $this->getNestedAttribute($attribute);
-
-        if (!property_exists($class, $attribute)) {
-            throw new InvalidArgumentException("Undefined property: \"$class::$attribute\".");
-        }
-
-        /** @psalm-suppress MixedMethodCall */
-        $getter = static fn (FormModelInterface $class, string $attribute) => $nested === null
-            ? $class->$attribute
-            : $class->$attribute->getAttributeValue($nested);
-
-        $getter = Closure::bind($getter, null, $this);
-
-        /** @var Closure $getter */
-        return $getter($this, $attribute);
-    }
-
-    /**
-     * @param string $attribute
-     * @param mixed $value
-     *
-     * @psalm-suppress MissingClosureReturnType
-     */
-    private function writeProperty(string $attribute, mixed $value): void
-    {
-        [$attribute, $nested] = $this->getNestedAttribute($attribute);
-
-        /**
-         * @psalm-suppress MissingClosureParamType
-         * @psalm-suppress MixedMethodCall
-         */
-        $setter = static fn (FormModelInterface $class, string $attribute, $value) => $nested === null
-            ? $class->$attribute = $value
-            : $class->$attribute->setAttribute($nested, $value);
-
-        $setter = Closure::bind($setter, null, $this);
-
-        /** @var Closure $setter */
-        $setter($this, $attribute, $value);
+        return match (empty($this->inflector)) {
+            true => $this->inflector = new Inflector(),
+            false => $this->inflector,
+        };
     }
 
     /**
@@ -355,7 +288,7 @@ abstract class FormModel implements FormModelInterface
      *
      * @psalm-return array{0: string, 1: null|string}
      */
-    private function getNestedAttribute(string $attribute): array
+    private function getNested(string $attribute): array
     {
         if (!str_contains($attribute, '.')) {
             return [$attribute, null];
@@ -363,29 +296,75 @@ abstract class FormModel implements FormModelInterface
 
         [$attribute, $nested] = explode('.', $attribute, 2);
 
-        /** @var object|string */
+        /** @var string */
         $attributeNested = $this->attributes[$attribute] ?? '';
 
         if (!is_subclass_of($attributeNested, self::class)) {
             throw new InvalidArgumentException("Attribute \"$attribute\" is not a nested attribute.");
         }
 
+        if (!property_exists($attributeNested, $nested)) {
+            throw new InvalidArgumentException("Undefined property: \"$attributeNested::$nested\".");
+        }
+
         return [$attribute, $nested];
     }
 
-    private function getNestedAttributeValue(string $method, string $attribute): string
+    private function getNestedValue(string $method, string $attribute): string
     {
         $result = '';
 
-        [$attribute, $nested] = $this->getNestedAttribute($attribute);
+        [$attribute, $nested] = $this->getNested($attribute);
 
         if ($nested !== null) {
-            /** @var FormModelInterface $attributeNestedValue */
-            $attributeNestedValue = $this->getAttributeValue($attribute);
+            /** @var FormModelContract $attributeNestedValue */
+            $attributeNestedValue = $this->getCastValue($attribute);
             /** @var string */
             $result = $attributeNestedValue->$method($nested);
         }
 
         return $result;
+    }
+
+    private function readProperty(string $attribute): mixed
+    {
+        $class = static::class;
+
+        [$attribute, $nested] = $this->getNested($attribute);
+
+        if (!property_exists($class, $attribute)) {
+            throw new InvalidArgumentException("Undefined property: \"$class::$attribute\".");
+        }
+
+        /** @psalm-suppress MixedMethodCall */
+        $getter = static function (FormModelContract $class, string $attribute, ?string $nested): mixed {
+            return match ($nested) {
+                null => $class->$attribute,
+                default => $class->$attribute->getCastValue($nested),
+            };
+        };
+
+        $getter = Closure::bind($getter, null, $this);
+
+        /** @var Closure $getter */
+        return $getter($this, $attribute, $nested);
+    }
+
+    private function writeProperty(string $attribute, mixed $value): void
+    {
+        [$attribute, $nested] = $this->getNested($attribute);
+
+        /** @psalm-suppress MixedMethodCall */
+        $setter = static function (FormModelContract $class, string $attribute, mixed $value, ?string $nested): void {
+            match ($nested) {
+                null => $class->$attribute = $value,
+                default => $class->$attribute->set($nested, $value),
+            };
+        };
+
+        $setter = Closure::bind($setter, null, $this);
+
+        /** @var Closure $setter */
+        $setter($this, $attribute, $value, $nested);
     }
 }

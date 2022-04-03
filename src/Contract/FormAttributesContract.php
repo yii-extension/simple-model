@@ -2,13 +2,37 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\Simple\Model;
+namespace Yii\Extension\FormModel\Contract;
 
-/**
- * FormModelInterface model represents an HTML form: its data, validation and presentation.
- */
-interface FormMetadataInterface
+use Yiisoft\Validator\DataSetInterface;
+
+interface FormAttributesContract extends DataSetInterface
 {
+    /**
+     * Return array with names of all attributes
+     *
+     * @return array
+     */
+    public function attributes(): array;
+
+    /**
+     * Returns the value for the specified attribute.
+     *
+     * @param string $attribute
+     *
+     * @return mixed
+     */
+    public function getAttributeValue(string $attribute): mixed;
+
+    /**
+     * Returns the value (raw data) for the specified attribute.
+     *
+     * @param string $attribute
+     *
+     * @return mixed
+     */
+    public function getCastValue(string $attribute): mixed;
+
     /**
      * Returns the text label for the specified attribute.
      *
@@ -16,25 +40,25 @@ interface FormMetadataInterface
      *
      * @return string the attribute label.
      */
-    public function getAttributeLabel(string $attribute): string;
+    public function getLabel(string $attribute): string;
 
     /**
      * Returns the attribute labels.
      *
-     * Attribute labels are mainly used for display purpose. For example, given an attribute `firstName`, we can
-     * declare a label `First Name` which is more user-friendly and can be displayed to end users.
+     * Attribute labels are mainly used for display purpose. For example, given an attribute `firstName`, we can declare
+     * a label `First Name` which is more user-friendly and can be displayed to end users.
      *
      * By default, an attribute label is generated automatically. This method allows you to explicitly specify attribute
      * labels.
      *
-     * Note, in order to inherit labels defined in the parent class, a child class needs to merge the parent labels
-     * with child labels using functions such as `array_merge()`.
+     * Note, in order to inherit labels defined in the parent class, a child class needs to merge the parent labels with
+     * child labels using functions such as `array_merge()`.
      *
      * @return array attribute labels (name => label)
      *
-     * {@see \Yii\Extension\Simple\Model\FormModel::getAttributeLabel()}
+     * {@see getLabel()}
      */
-    public function getAttributeLabels(): array;
+    public function getLabels(): array;
 
     /**
      * Returns the text hint for the specified attribute.
@@ -43,7 +67,7 @@ interface FormMetadataInterface
      *
      * @return string the attribute hint.
      */
-    public function getAttributeHint(string $attribute): string;
+    public function getHint(string $attribute): string;
 
     /**
      * Returns the attribute hints.
@@ -59,7 +83,7 @@ interface FormMetadataInterface
      *
      * @return array attribute hints (name => hint)
      */
-    public function getAttributeHints(): array;
+    public function getHints(): array;
 
     /**
      * Returns the text placeholder for the specified attribute.
@@ -68,12 +92,21 @@ interface FormMetadataInterface
      *
      * @return string the attribute placeholder.
      */
-    public function getAttributePlaceholder(string $attribute): string;
+    public function getPlaceholder(string $attribute): string;
 
     /**
      * Returns the attribute placeholders.
      *
      * @return array attribute placeholder (name => placeholder)
      */
-    public function getAttributePlaceholders(): array;
+    public function getPlaceholders(): array;
+
+    /**
+     * If there is such attribute in the set.
+     *
+     * @param string $attribute
+     *
+     * @return bool
+     */
+    public function has(string $attribute): bool;
 }
