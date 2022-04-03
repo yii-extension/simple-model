@@ -10,10 +10,9 @@ use ReflectionClass;
 use ReflectionNamedType;
 use Yii\Extension\FormModel\Contract\FormErrorsContract;
 use Yii\Extension\FormModel\Contract\FormModelContract;
-use Yii\Extension\FormModel\Validator\Validator;
+use Yii\Extension\FormModel\FormValidator;
 use Yiisoft\Strings\Inflector;
 use Yiisoft\Strings\StringHelper;
-use Yiisoft\Validator\DataSet\AttributeDataSet;
 use Yiisoft\Validator\Result;
 
 use function array_key_exists;
@@ -224,13 +223,12 @@ abstract class FormModel implements FormModelContract
 
     public function validate(): bool
     {
-        return (new Validator($this))->validate()->isValid();
+        return (new FormValidator($this))->validate()->isValid();
     }
 
     public function validateWithAttributes(): bool
     {
-        $attributeDataSet = new AttributeDataSet($this, $this->rawData);
-        return (new Validator($this))->validateWithAttributes($attributeDataSet)->isValid();
+        return (new FormValidator($this))->validateWithAttributes($this->rawData)->isValid();
     }
 
     /**

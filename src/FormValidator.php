@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\FormModel\Validator;
+namespace Yii\Extension\FormModel;
 
 use Yii\Extension\FormModel\Contract\FormModelContract;
 use Yiisoft\Validator\DataSet\AttributeDataSet;
@@ -17,7 +17,7 @@ use function is_object;
 /**
  * Validator validates {@link FormModelContract} against rules set for data set attributes.
  */
-final class Validator
+final class FormValidator
 {
     public function __construct(private FormModelContract $formModel)
     {
@@ -51,8 +51,9 @@ final class Validator
         return $result;
     }
 
-    public function validateWithAttributes(AttributeDataSet $attributeDataSet): Result
+    public function validateWithAttributes(array $rawData): Result
     {
+        $attributeDataSet = new AttributeDataSet($this->formModel, $rawData);
         $context = new ValidationContext($this->formModel);
         $result = new Result();
         $rules = $attributeDataSet->getRules();
