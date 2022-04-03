@@ -68,6 +68,15 @@ final class FormModelAttributesTest extends TestCase
         $this->assertSame('Login:', $formModel->getLabel('login'));
     }
 
+    public function testGetLabelException(): void
+    {
+        $formModel = new Login();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Attribute 'noExist' does not exist.");
+        $formModel->getLabel('noExist');
+    }
+
     public function testGetLabels(): void
     {
         $formModel = new Stub();
@@ -98,7 +107,7 @@ final class FormModelAttributesTest extends TestCase
         $this->assertFalse($formModel->has('extraField'));
     }
 
-    public function testSetAttribute(): void
+    public function testSet(): void
     {
         $formModel = new Type();
 
@@ -130,7 +139,7 @@ final class FormModelAttributesTest extends TestCase
         $this->assertIsString($formModel->getAttributeValue('string'));
     }
 
-    public function testSetAttributes(): void
+    public function testSets(): void
     {
         $formModel = new Type();
 
@@ -171,5 +180,14 @@ final class FormModelAttributesTest extends TestCase
         $this->assertIsInt($formModel->getAttributeValue('int'));
         $this->assertIsObject($formModel->getAttributeValue('object'));
         $this->assertIsString($formModel->getAttributeValue('string'));
+    }
+
+    public function testSetsException(): void
+    {
+        $formModel = new Type();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Attribute "noExist" does not exist');
+        $formModel->sets(['noExist' => []]);
     }
 }

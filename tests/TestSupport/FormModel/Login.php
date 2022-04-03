@@ -11,16 +11,9 @@ use Yiisoft\Validator\Rule\Required;
 
 final class Login extends FormModel
 {
-    public string $name = '';
-    private string $lastName = '';
     private ?string $login = null;
     private ?string $password = null;
     private bool $rememberMe = false;
-
-    public function getLastName(): string
-    {
-        return $this->lastName;
-    }
 
     public function getLogin(): ?string
     {

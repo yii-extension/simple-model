@@ -9,7 +9,7 @@ interface FormModelContract extends FormAttributesContract
     /**
      * @return FormErrorsContract Validation errors.
      */
-    public function getFormErrors(): FormErrorsContract;
+    public function error(): FormErrorsContract;
 
     /**
      * Returns the form name that this model class should use.

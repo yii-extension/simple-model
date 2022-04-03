@@ -16,7 +16,7 @@ final class FormErrorsAttributes
      */
     public static function get(FormModelContract $formModel, string $attribute): array
     {
-        return $formModel->getFormErrors()->get($attribute);
+        return $formModel->error()->get($attribute);
     }
 
     /**
@@ -28,7 +28,7 @@ final class FormErrorsAttributes
      */
     public static function getAll(FormModelContract $formModel): array
     {
-        return $formModel->getFormErrors()->getAll();
+        return $formModel->error()->getAll();
     }
 
     /**
@@ -41,7 +41,7 @@ final class FormErrorsAttributes
      */
     public static function getFirst(FormModelContract $formModel, string $attribute): string
     {
-        return $formModel->getFormErrors()->getFirst(FormModelAttributes::getName($formModel, $attribute));
+        return $formModel->error()->getFirst(FormModelAttributes::getName($formModel, $attribute));
     }
 
     /**
@@ -54,7 +54,7 @@ final class FormErrorsAttributes
      */
     public static function getFirsts(FormModelContract $formModel): array
     {
-        return $formModel->getFormErrors()->getFirsts();
+        return $formModel->error()->getFirsts();
     }
 
     /**
@@ -67,7 +67,7 @@ final class FormErrorsAttributes
      */
     public static function getSummary(FormModelContract $formModel, array $onlyAttributes = []): array
     {
-        return $formModel->getFormErrors()->getSummary($onlyAttributes);
+        return $formModel->error()->getSummary($onlyAttributes);
     }
 
     /**
@@ -79,7 +79,7 @@ final class FormErrorsAttributes
      */
     public static function getSummaryFirst(FormModelContract $formModel): array
     {
-        return $formModel->getFormErrors()->getSummaryFirst();
+        return $formModel->error()->getSummaryFirst();
     }
 
     /**
@@ -92,6 +92,6 @@ final class FormErrorsAttributes
      */
     public static function has(FormModelContract $formModel, ?string $attribute = null): bool
     {
-        return $formModel->getFormErrors()->has($attribute);
+        return $formModel->error()->has($attribute);
     }
 }

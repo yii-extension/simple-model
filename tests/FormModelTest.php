@@ -10,6 +10,7 @@ use stdClass;
 use Yii\Extension\FormModel\Attribute\FormErrorsAttribute;
 use Yii\Extension\FormModel\FormModel;
 use Yii\Extension\FormModel\FormModelInterface;
+use Yii\Extension\FormModel\Tests\TestSupport\Error\CustomFormErrors;
 use Yii\Extension\FormModel\Tests\TestSupport\FormModel\Login;
 use Yii\Extension\FormModel\Tests\TestSupport\FormModel\Stub;
 use Yii\Extension\FormModel\Tests\TestSupport\FormModel\Type;
@@ -20,6 +21,12 @@ require __DIR__ . '/TestSupport/FormModel/NonNamespaced.php';
 final class FormModelTest extends TestCase
 {
     use TestTrait;
+
+    public function testAttributes(): void
+    {
+        $form = new Stub();
+        $this->assertSame(['public', 'protected', 'private'], $form->attributes());
+    }
 
     public function testGetFormName(): void
     {
@@ -77,17 +84,17 @@ final class FormModelTest extends TestCase
 
     public function testLoadPublicField(): void
     {
-        $formModel = new Login();
-        $this->assertEmpty($formModel->name);
+        $formModel = new Stub();
+        $this->assertEmpty($formModel->public);
 
         $data = [
-            'Login' => [
-                'name' => 'samdark',
+            'Stub' => [
+                'public' => 'samdark',
             ],
         ];
 
         $this->assertTrue($formModel->load($data));
-        $this->assertSame('samdark', $formModel->name);
+        $this->assertSame('samdark', $formModel->public);
     }
 
     public function testLoadWithEmptyScope(): void
@@ -110,12 +117,25 @@ final class FormModelTest extends TestCase
         $this->assertIsString($formModel->getCastValue('string'));
     }
 
-    public function testSetsException(): void
+    public function testProtectedCollectAttributes(): void
     {
-        $formModel = new Type();
+        $form = new class () extends FormModel {
+            protected int $int = 1;
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Attribute "noExist" does not exist');
-        $formModel->sets(['noExist' => []]);
+            public function collectAttributes(): array
+            {
+                return array_merge(parent::collectAttributes(), ['null' => 'null']);
+            }
+        };
+        $this->assertSame(['int' => 'int', 'null' => 'null'], $form->collectAttributes());
+    }
+
+    public function testSetFormErrors(): void
+    {
+        $formErrors = new CustomFormErrors();
+        $formModel = new Login();
+
+        $formModel->setFormErrors($formErrors);
+        $this->assertSame($formErrors, $formModel->error());
     }
 }

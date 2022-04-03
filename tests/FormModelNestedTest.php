@@ -13,11 +13,11 @@ final class FormModelNestedTest extends TestCase
     public function testGetAttributeValue(): void
     {
         $formModel = new Nested();
-        $formModel->setUserLogin('admin');
+        $formModel->set('user.login', 'admin');
         $this->assertSame('admin', $formModel->getAttributeValue('user.login'));
     }
 
-    public function testGetAttributeValueExceptionUndefinedAttribute(): void
+    public function testGetAttributeValueNotNestedException(): void
     {
         $formModel = new Nested();
         $this->expectException(InvalidArgumentException::class);
@@ -25,7 +25,7 @@ final class FormModelNestedTest extends TestCase
         $formModel->getAttributeValue('profile.user');
     }
 
-    public function testGetAttributeValueExceptionUndefinedProperty(): void
+    public function testGetAttributeValueUndefinedPropertyException(): void
     {
         $formModel = new Nested();
         $this->expectException(InvalidArgumentException::class);
@@ -54,21 +54,32 @@ final class FormModelNestedTest extends TestCase
         $this->assertSame('Type Username or Email.', $formModel->getPlaceHolder('user.login'));
     }
 
+    public function testHasException(): void
+    {
+        $form = new Nested();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Undefined property: "Yii\Extension\FormModel\Tests\TestSupport\FormModel\Login::noExist'
+        );
+        $form->has('user.noExist');
+    }
+
     public function testLoadPublicField(): void
     {
         $formModel = new Nested();
-        $this->assertEmpty($formModel->getname());
-        $this->assertEmpty($formModel->getLastName());
+        $this->assertEmpty($formModel->getAttributeValue('user.login'));
+        $this->assertEmpty($formModel->getAttributeValue('user.password'));
 
         $data = [
             'Nested' => [
-                'user.name' => 'joe',
-                'user.lastName' => 'doe',
+                'user.login' => 'joe',
+                'user.password' => '123456',
             ],
         ];
 
         $this->assertTrue($formModel->load($data));
-        $this->assertSame('joe', $formModel->getName());
-        $this->assertSame('doe', $formModel->getLastName());
+        $this->assertSame('joe', $formModel->getAttributeValue('user.login'));
+        $this->assertSame('123456', $formModel->getAttributeValue('user.password'));
     }
 }

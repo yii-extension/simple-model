@@ -19,33 +19,18 @@ final class Nested extends FormModel
         parent::__construct();
     }
 
-    public function getAttributeLabels(): array
+    public function getLabels(): array
     {
         return [
             'id' => 'Id',
         ];
     }
 
-    public function getAttributeHints(): array
+    public function getHints(): array
     {
         return [
             'id' => 'Readonly ID',
         ];
-    }
-
-    public function getLastName(): string
-    {
-        return $this->user->getLastName();
-    }
-
-    public function getName(): string
-    {
-        return $this->user->name;
-    }
-
-    public function getUserLogin(): ?string
-    {
-        return $this->user->getLogin();
     }
 
     public function getRules(): array
@@ -53,10 +38,5 @@ final class Nested extends FormModel
         return [
             'id' => Required::rule(),
         ];
-    }
-
-    public function setUserLogin(string $login): void
-    {
-        $this->user->login($login);
     }
 }

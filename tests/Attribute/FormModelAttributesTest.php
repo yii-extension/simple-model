@@ -106,4 +106,22 @@ final class FormModelAttributesTest extends TestCase
         $formModel = new Login();
         $this->assertNull(FormModelAttributes::getValue($formModel, 'login'));
     }
+
+    public function testMultibyteGetName(): void
+    {
+        $formModel = new class () extends FormModel {
+            private string $登录 = '';
+        };
+        $this->assertSame('登录', FormModelAttributes::getName($formModel, '[0]登录'));
+        $this->assertSame('登录', FormModelAttributes::getName($formModel, '登录[0]'));
+        $this->assertSame('登录', FormModelAttributes::getName($formModel, '[0]登录[0]'));
+    }
+
+    public function testMutlibyteGetInputId(): void
+    {
+        $formModel = new class () extends FormModel {
+            private string $mĄkA = '';
+        };
+        $this->assertSame('mąka', FormModelAttributes::getInputId($formModel, 'mĄkA'));
+    }
 }

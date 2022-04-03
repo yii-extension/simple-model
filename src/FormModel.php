@@ -44,12 +44,20 @@ abstract class FormModel implements FormModelContract, PostValidationHookInterfa
         return array_keys($this->attributes);
     }
 
+    public function error(): FormErrorsContract
+    {
+        return match (empty($this->formErrors)) {
+            true => $this->formErrors = new FormErrors(),
+            false => $this->formErrors,
+        };
+    }
+
     public function getHint(string $attribute): string
     {
-        $attributeHints = $this->getHints();
-        $hint = $attributeHints[$attribute] ?? '';
-        $nestedAttributeHint = $this->getNestedValue('getHint', $attribute);
-        return $nestedAttributeHint !== '' ? $nestedAttributeHint : $hint;
+        $hints = $this->getHints();
+        $hint = $hints[$attribute] ?? '';
+        $nestedHint = $this->getNestedValue('getHint', $attribute);
+        return $nestedHint !== '' ? $nestedHint : $hint;
     }
 
     /**
@@ -63,9 +71,11 @@ abstract class FormModel implements FormModelContract, PostValidationHookInterfa
     public function getLabel(string $attribute): string
     {
         $labels = $this->getLabels();
+        $label = $labels[$attribute] ?? $this->generateLabel($attribute);
+        $nestedLabel = $this->getNestedValue('getLabel', $attribute);
 
         $label = match ($this->has($attribute)) {
-            true => $labels[$attribute] ?? $this->getNestedValue('getLabel', $attribute),
+            true => $nestedLabel === '' ? $label : $nestedLabel,
             false => throw new InvalidArgumentException("Attribute '$attribute' does not exist."),
         };
 
@@ -82,10 +92,10 @@ abstract class FormModel implements FormModelContract, PostValidationHookInterfa
 
     public function getPlaceholder(string $attribute): string
     {
-        $attributePlaceHolders = $this->getPlaceholders();
-        $placeholder = $attributePlaceHolders[$attribute] ?? '';
-        $nestedAttributePlaceholder = $this->getNestedValue('getPlaceholder', $attribute);
-        return $nestedAttributePlaceholder !== '' ? $nestedAttributePlaceholder : $placeholder;
+        $placeHolders = $this->getPlaceholders();
+        $placeholder = $placeHolders[$attribute] ?? '';
+        $nestedPlaceholder = $this->getNestedValue('getPlaceholder', $attribute);
+        return $nestedPlaceholder !== '' ? $nestedPlaceholder : $placeholder;
     }
 
     /**
@@ -104,14 +114,6 @@ abstract class FormModel implements FormModelContract, PostValidationHookInterfa
     public function getAttributeValue(string $attribute): mixed
     {
         return $this->rawData[$attribute] ?? $this->getCastValue($attribute);
-    }
-
-    public function getFormErrors(): FormErrorsContract
-    {
-        return match (empty($this->formErrors)) {
-            true => $this->formErrors = new FormErrors(),
-            false => $this->formErrors,
-        };
     }
 
     /**
@@ -133,7 +135,7 @@ abstract class FormModel implements FormModelContract, PostValidationHookInterfa
 
     public function has(string $attribute): bool
     {
-        [$attribute, $nested] = $this->getNestedAttribute($attribute);
+        [$attribute, $nested] = $this->getNested($attribute);
 
         return $nested !== null || array_key_exists($attribute, $this->attributes);
     }
@@ -151,12 +153,11 @@ abstract class FormModel implements FormModelContract, PostValidationHookInterfa
         $this->rawData = [];
         $scope = $formName ?? $this->getFormName();
 
-        if ($scope === '' && !empty($data)) {
-            $this->rawData = $data;
-        } elseif (isset($data[$scope])) {
-            /** @var array<string, string> */
-            $this->rawData = $data[$scope];
-        }
+        /** @psalm-var array<string, string> */
+        $this->rawData = match (empty($scope)) {
+            true => $data,
+            false => isset($data[$scope]) ? $data[$scope] : [],
+        };
 
         foreach ($this->rawData as $name => $value) {
             $this->set($name, $value);
@@ -167,7 +168,7 @@ abstract class FormModel implements FormModelContract, PostValidationHookInterfa
 
     public function set(string $name, mixed $value): void
     {
-        [$realName] = $this->getNestedAttribute($name);
+        [$realName] = $this->getNested($name);
 
         if (isset($this->attributes[$realName])) {
             /** @var mixed */
@@ -234,14 +235,11 @@ abstract class FormModel implements FormModelContract, PostValidationHookInterfa
         $attributes = [];
 
         foreach ($class->getProperties() as $property) {
-            if ($property->isStatic()) {
-                continue;
+            if ($property->isStatic() === false) {
+                /** @var ReflectionNamedType|null $type */
+                $type = $property->getType();
+                $attributes[$property->getName()] = $type !== null ? $type->getName() : '';
             }
-
-            /** @var ReflectionNamedType|null $type */
-            $type = $property->getType();
-
-            $attributes[$property->getName()] = $type !== null ? $type->getName() : '';
         }
 
         return $attributes;
@@ -254,7 +252,7 @@ abstract class FormModel implements FormModelContract, PostValidationHookInterfa
     {
         foreach ($items as $attribute => $errors) {
             foreach ($errors as $error) {
-                $this->getFormErrors()->add($attribute, $error);
+                $this->error()->add($attribute, $error);
             }
         }
     }
@@ -290,7 +288,7 @@ abstract class FormModel implements FormModelContract, PostValidationHookInterfa
     {
         $class = static::class;
 
-        [$attribute, $nested] = $this->getNestedAttribute($attribute);
+        [$attribute, $nested] = $this->getNested($attribute);
 
         if (!property_exists($class, $attribute)) {
             throw new InvalidArgumentException("Undefined property: \"$class::$attribute\".");
@@ -312,7 +310,7 @@ abstract class FormModel implements FormModelContract, PostValidationHookInterfa
 
     private function writeProperty(string $attribute, mixed $value): void
     {
-        [$attribute, $nested] = $this->getNestedAttribute($attribute);
+        [$attribute, $nested] = $this->getNested($attribute);
 
         /** @psalm-suppress MixedMethodCall */
         $setter = static function (FormModelContract $class, string $attribute, mixed $value, ?string $nested): void {
@@ -333,7 +331,7 @@ abstract class FormModel implements FormModelContract, PostValidationHookInterfa
      *
      * @psalm-return array{0: string, 1: null|string}
      */
-    private function getNestedAttribute(string $attribute): array
+    private function getNested(string $attribute): array
     {
         if (!str_contains($attribute, '.')) {
             return [$attribute, null];
@@ -359,7 +357,7 @@ abstract class FormModel implements FormModelContract, PostValidationHookInterfa
     {
         $result = '';
 
-        [$attribute, $nested] = $this->getNestedAttribute($attribute);
+        [$attribute, $nested] = $this->getNested($attribute);
 
         if ($nested !== null) {
             /** @var FormModelContract $attributeNestedValue */
