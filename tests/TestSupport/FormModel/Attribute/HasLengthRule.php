@@ -10,5 +10,5 @@ use Yiisoft\Validator\Rule\HasLength;
 final class HasLengthRule extends FormModel
 {
     #[HasLength(min: 3, max: 6)]
-    private string $name = '';
+    private string $hasLengthRule = '';
 }

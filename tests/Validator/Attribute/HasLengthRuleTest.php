@@ -16,29 +16,29 @@ final class HasLengthRuleTest extends TestCase
         $this->assertFalse($formModel->validateWithAttributes());
         $this->assertSame(
             [
-                'name' => [
+                'hasLengthRule' => [
                     'This value should contain at least {min, number} {min, plural, one{character} other{characters}}.'
                 ],
             ],
             FormErrorsAttributes::getAll($formModel)
         );
 
-        $this->assertTrue($formModel->load(['HasLengthRule' => ['name' => 'al']]));
+        $this->assertTrue($formModel->load(['HasLengthRule' => ['hasLengthRule' => 'al']]));
         $this->assertFalse($formModel->validateWithAttributes());
         $this->assertSame(
             [
-                'name' => [
+                'hasLengthRule' => [
                     'This value should contain at least {min, number} {min, plural, one{character} other{characters}}.'
                 ],
             ],
             FormErrorsAttributes::getAll($formModel)
         );
 
-        $this->assertTrue($formModel->load(['HasLengthRule' => ['name' => 'samdark']]));
+        $this->assertTrue($formModel->load(['HasLengthRule' => ['hasLengthRule' => 'samdark']]));
         $this->assertFalse($formModel->validateWithAttributes());
         $this->assertSame(
             [
-                'name' => [
+                'hasLengthRule' => [
                     'This value should contain at most {max, number} {max, plural, one{character} other{characters}}.'
                 ],
             ],
