@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\FormModel\Tests;
+namespace Yii\Extension\FormModel\Tests\Validator\Attribute;
 
 use PHPUnit\Framework\TestCase;
 use Yii\Extension\FormModel\Attribute\FormErrorsAttributes;
-use Yii\Extension\FormModel\Tests\TestSupport\FormModel\ValidatorAttribute;
+use Yii\Extension\FormModel\Tests\TestSupport\FormModel\Attribute\RequiredRule;
 
-final class ValidatorAttributeTest extends TestCase
+final class RequiredRuleTest extends TestCase
 {
-    public function testRequired(): void
+    public function testAttribute(): void
     {
-        $formModel = new ValidatorAttribute();
+        $formModel = new RequiredRule();
         $this->assertFalse($formModel->validateWithAttributes());
         $this->assertSame(['required' => ['Value cannot be blank.']], FormErrorsAttributes::getAll($formModel));
     }

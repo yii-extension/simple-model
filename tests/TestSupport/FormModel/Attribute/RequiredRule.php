@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\FormModel\Tests\TestSupport\FormModel;
+namespace Yii\Extension\FormModel\Tests\TestSupport\FormModel\Attribute;
 
 use Yii\Extension\FormModel\FormModel;
 use Yiisoft\Validator\Rule\Required;
 
-final class ValidatorAttribute extends FormModel
+final class RequiredRule extends FormModel
 {
     #[Required]
     private string $required = '';
