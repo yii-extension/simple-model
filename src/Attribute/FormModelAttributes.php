@@ -6,19 +6,19 @@ namespace Yii\Extension\FormModel\Attribute;
 
 use InvalidArgumentException;
 use UnexpectedValueException;
-use Yii\Extension\FormModel\Contract\FormModelContract;
+use Yii\Extension\FormModel\FormModel;
 
 final class FormModelAttributes
 {
     /**
      * Return the attribute hint for the model.
      *
-     * @param FormModelContract $formModel the form object.
+     * @param FormModel $formModel the form object.
      * @param string $attribute the attribute name or expression.
      *
      * @return string
      */
-    public static function getHint(FormModelContract $formModel, string $attribute): string
+    public static function getHint(FormModel $formModel, string $attribute): string
     {
         return $formModel->getHint(self::getName($formModel, $attribute));
     }
@@ -30,7 +30,7 @@ final class FormModelAttributes
      *
      * For example, if {@see getInputName()} returns `Post[content]`, this method will return `post-content`.
      *
-     * @param FormModelContract $formModel the form object
+     * @param FormModel $formModel the form object
      * @param string $attribute the attribute name or expression. See {@see getName()} for explanation of
      * attribute expression.
      * @param string $charset default `UTF-8`.
@@ -41,7 +41,7 @@ final class FormModelAttributes
      * @return string the generated input ID.
      */
     public static function getInputId(
-        FormModelContract $formModel,
+        FormModel $formModel,
         string $attribute,
         string $charset = 'UTF-8'
     ): string {
@@ -59,7 +59,7 @@ final class FormModelAttributes
      *
      * See {@see getName()} for explanation of attribute expression.
      *
-     * @param FormModelContract $formModel the form object.
+     * @param FormModel $formModel the form object.
      * @param string $attribute the attribute name or expression.
      *
      * @throws InvalidArgumentException if the attribute name contains non-word characters
@@ -67,7 +67,7 @@ final class FormModelAttributes
      *
      * @return string the generated input name.
      */
-    public static function getInputName(FormModelContract $formModel, string $attribute): string
+    public static function getInputName(FormModel $formModel, string $attribute): string
     {
         $data = self::parse($attribute);
         $formName = $formModel->getFormName();
@@ -86,14 +86,14 @@ final class FormModelAttributes
     /**
      * Returns the label of the specified attribute name.
      *
-     * @param FormModelContract $formModel the form object.
+     * @param FormModel $formModel the form object.
      * @param string $attribute the attribute name or expression.
      *
      * @throws InvalidArgumentException if the attribute name contains non-word characters.
      *
      * @return string
      */
-    public static function getLabel(FormModelContract $formModel, string $attribute): string
+    public static function getLabel(FormModel $formModel, string $attribute): string
     {
         return $formModel->getLabel(self::getName($formModel, $attribute));
     }
@@ -102,7 +102,7 @@ final class FormModelAttributes
      * Returns the real attribute name from the given attribute expression.
      * If `$attribute` has neither prefix nor suffix, it will be returned without change.
      *
-     * @param FormModelContract $formModel the form object.
+     * @param FormModel $formModel the form object.
      * @param string $attribute the attribute name or expression
      *
      * @throws InvalidArgumentException if the attribute name contains non-word characters.
@@ -111,7 +111,7 @@ final class FormModelAttributes
      *
      * @see static::parse()
      */
-    public static function getName(FormModelContract $formModel, string $attribute): string
+    public static function getName(FormModel $formModel, string $attribute): string
     {
         $attribute = self::parse($attribute)['name'];
 
@@ -125,14 +125,14 @@ final class FormModelAttributes
     /**
      * Returns the placeholder of the specified attribute name.
      *
-     * @param FormModelContract $formModel the form object.
+     * @param FormModel $formModel the form object.
      * @param string $attribute the attribute name or expression.
      *
      * @throws InvalidArgumentException if the attribute name contains non-word characters.
      *
      * @return string
      */
-    public static function getPlaceHolder(FormModelContract $formModel, string $attribute): string
+    public static function getPlaceHolder(FormModel $formModel, string $attribute): string
     {
         return $formModel->getPlaceHolder(self::getName($formModel, $attribute));
     }
@@ -146,14 +146,14 @@ final class FormModelAttributes
      * If an attribute value an array of such instances, the primary value(s) of the AR instance(s) will be returned
      * instead.
      *
-     * @param FormModelContract $formModel the form object.
+     * @param FormModel $formModel the form object.
      * @param string $attribute the attribute name or expression.
      *
      * @throws InvalidArgumentException if the attribute name contains non-word characters.
      *
      * @return mixed the corresponding attribute value.
      */
-    public static function getValue(FormModelContract $formModel, string $attribute): mixed
+    public static function getValue(FormModel $formModel, string $attribute): mixed
     {
         return $formModel->getAttributeValue(self::getName($formModel, $attribute));
     }

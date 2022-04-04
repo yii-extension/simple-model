@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yii\Extension\FormModel;
 
-use Yii\Extension\FormModel\Contract\FormModelContract;
 use Yiisoft\Validator\DataSet\AttributeDataSet;
 use Yiisoft\Validator\Result;
 use Yiisoft\Validator\Rule;
@@ -15,11 +14,11 @@ use function is_array;
 use function is_object;
 
 /**
- * Validator validates {@link FormModelContract} against rules set for data set attributes.
+ * Validator validates {@link FormModel} against rules set for data set attributes.
  */
 final class FormValidator
 {
-    public function __construct(private FormModelContract $formModel, private array $rowData)
+    public function __construct(private FormModel|Model $formModel, private array $rowData)
     {
     }
 

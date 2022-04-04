@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yii\Extension\FormModel\Contract;
 
-interface FormModelContract extends FormAttributesContract
+interface FormModelContract
 {
     /**
      * @return FormErrorsContract Validation errors.
@@ -64,6 +64,15 @@ interface FormModelContract extends FormAttributesContract
      * @return array Validation rules.
      */
     public function getRules(): array;
+
+    /**
+     * If there is such attribute in the set.
+     *
+     * @param string $attribute
+     *
+     * @return bool
+     */
+    public function has(string $attribute): bool;
 
     /**
      * Return whether the form model is empty.
