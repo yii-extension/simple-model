@@ -8,14 +8,14 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use StdClass;
 use Yii\Extension\FormModel\Tests\TestSupport\FormModel\Login;
-use Yii\Extension\FormModel\Tests\TestSupport\FormModel\Stub;
-use Yii\Extension\FormModel\Tests\TestSupport\FormModel\Type;
+use Yii\Extension\FormModel\Tests\TestSupport\FormModel\PropertyType;
+use Yii\Extension\FormModel\Tests\TestSupport\FormModel\PropertyVisibility;
 
 final class FormModelAttributesTest extends TestCase
 {
     public function testGetAttributeValue(): void
     {
-        $formModel = new Type();
+        $formModel = new PropertyType();
 
         $formModel->set('array', [1, 2]);
         $this->assertIsArray($formModel->getAttributeValue('array'));
@@ -43,7 +43,7 @@ final class FormModelAttributesTest extends TestCase
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Undefined property: "Yii\Extension\FormModel\Tests\TestSupport\FormModel\Type::noExist".'
+            'Undefined property: "Yii\Extension\FormModel\Tests\TestSupport\FormModel\PropertyType::noExist".'
         );
         $formModel->getAttributeValue('noExist');
     }
@@ -65,7 +65,7 @@ final class FormModelAttributesTest extends TestCase
 
     public function testGetHints(): void
     {
-        $formModel = new Stub();
+        $formModel = new PropertyVisibility();
         $this->assertSame([], $formModel->getHints());
     }
 
@@ -85,15 +85,15 @@ final class FormModelAttributesTest extends TestCase
 
     public function testGetLabels(): void
     {
-        $formModel = new Stub();
+        $formModel = new PropertyVisibility();
         $this->assertSame([], $formModel->getLabels());
     }
 
     public function testGetPlaceHolder(): void
     {
         $formModel = new Login();
-        $this->assertSame('Type Username or Email.', $formModel->getPlaceHolder('login'));
-        $this->assertSame('Type Password.', $formModel->getPlaceHolder('password'));
+        $this->assertSame('Write Username or Email.', $formModel->getPlaceHolder('login'));
+        $this->assertSame('Write Password.', $formModel->getPlaceHolder('password'));
     }
 
     public function testGetPlaceException(): void
@@ -106,7 +106,7 @@ final class FormModelAttributesTest extends TestCase
 
     public function testGetPlaceHolders(): void
     {
-        $formModel = new Stub();
+        $formModel = new PropertyVisibility();
         $this->assertSame([], $formModel->getPlaceHolders());
     }
 
@@ -122,7 +122,7 @@ final class FormModelAttributesTest extends TestCase
 
     public function testSet(): void
     {
-        $formModel = new Type();
+        $formModel = new PropertyType();
 
         $formModel->set('array', []);
         $this->assertIsArray($formModel->getAttributeValue('array'));
@@ -154,7 +154,7 @@ final class FormModelAttributesTest extends TestCase
 
     public function testSets(): void
     {
-        $formModel = new Type();
+        $formModel = new PropertyType();
 
         // set attributes with array and to camel case disabled.
         $formModel->sets(
@@ -197,7 +197,7 @@ final class FormModelAttributesTest extends TestCase
 
     public function testSetsException(): void
     {
-        $formModel = new Type();
+        $formModel = new PropertyType();
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Attribute "noExist" does not exist');
         $formModel->sets(['noExist' => []]);

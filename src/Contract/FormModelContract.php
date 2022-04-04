@@ -66,6 +66,11 @@ interface FormModelContract extends FormAttributesContract
     public function getRules(): array;
 
     /**
+     * Return whether the form model is empty.
+     */
+    public function isEmpty(): bool;
+
+    /**
      * Populates the model with input data.
      *
      * which, with `load()` can be written as:

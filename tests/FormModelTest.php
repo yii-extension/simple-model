@@ -12,8 +12,8 @@ use Yii\Extension\FormModel\FormModel;
 use Yii\Extension\FormModel\FormModelInterface;
 use Yii\Extension\FormModel\Tests\TestSupport\Error\CustomFormErrors;
 use Yii\Extension\FormModel\Tests\TestSupport\FormModel\Login;
-use Yii\Extension\FormModel\Tests\TestSupport\FormModel\Stub;
-use Yii\Extension\FormModel\Tests\TestSupport\FormModel\Type;
+use Yii\Extension\FormModel\Tests\TestSupport\FormModel\PropertyType;
+use Yii\Extension\FormModel\Tests\TestSupport\FormModel\PropertyVisibility;
 use Yii\Extension\FormModel\Tests\TestSupport\TestTrait;
 
 require __DIR__ . '/TestSupport/FormModel/NonNamespaced.php';
@@ -24,14 +24,14 @@ final class FormModelTest extends TestCase
 
     public function testAttributes(): void
     {
-        $form = new Stub();
+        $form = new PropertyVisibility();
         $this->assertSame(['public', 'protected', 'private'], $form->attributes());
     }
 
     public function testGetFormName(): void
     {
-        $formModel = new Stub();
-        $this->assertSame('Stub', $formModel->getFormName());
+        $formModel = new PropertyVisibility();
+        $this->assertSame('PropertyVisibility', $formModel->getFormName());
 
         $formModel = new Login();
         $this->assertSame('Login', $formModel->getFormName());
@@ -46,8 +46,14 @@ final class FormModelTest extends TestCase
 
     public function testGetRules(): void
     {
-        $formModel = new Stub();
+        $formModel = new PropertyVisibility();
         $this->assertSame([], $formModel->getRules());
+    }
+
+    public function testIsEmpty(): void
+    {
+        $formModel = new Login();
+        $this->assertTrue($formModel->isEmpty());
     }
 
     public function testLoad(): void
@@ -78,11 +84,11 @@ final class FormModelTest extends TestCase
 
     public function testLoadPublicField(): void
     {
-        $formModel = new Stub();
+        $formModel = new PropertyVisibility();
         $this->assertEmpty($formModel->public);
 
         $data = [
-            'Stub' => [
+            'PropertyVisibility' => [
                 'public' => 'samdark',
             ],
         ];

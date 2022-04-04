@@ -70,8 +70,8 @@ final class Login extends FormModel
     public function getPlaceholders(): array
     {
         return [
-            'login' => 'Type Username or Email.',
-            'password' => 'Type Password.',
+            'login' => 'Write Username or Email.',
+            'password' => 'Write Password.',
         ];
     }
 

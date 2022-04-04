@@ -6,7 +6,7 @@ namespace Yii\Extension\FormModel\Tests\TestSupport\FormModel;
 
 use Yii\Extension\FormModel\FormModel;
 
-final class Type extends FormModel
+final class PropertyType extends FormModel
 {
     private array $array = [];
     private bool $bool = false;

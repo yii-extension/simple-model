@@ -155,6 +155,11 @@ abstract class FormModel implements FormModelContract
         return $nested !== null || array_key_exists($attribute, $this->attributes);
     }
 
+    public function isEmpty(): bool
+    {
+        return empty($this->rawData);
+    }
+
     /**
      * @param array $data
      * @param string|null $formName

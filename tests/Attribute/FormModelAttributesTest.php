@@ -81,8 +81,8 @@ final class FormModelAttributesTest extends TestCase
     public function testGetPlaceHolder(): void
     {
         $formModel = new Login();
-        $this->assertSame('Type Username or Email.', FormModelAttributes::getPlaceHolder($formModel, 'login'));
-        $this->assertSame('Type Password.', FormModelAttributes::getPlaceHolder($formModel, 'password'));
+        $this->assertSame('Write Username or Email.', FormModelAttributes::getPlaceHolder($formModel, 'login'));
+        $this->assertSame('Write Password.', FormModelAttributes::getPlaceHolder($formModel, 'password'));
     }
 
     public function dataGetInputName(): array

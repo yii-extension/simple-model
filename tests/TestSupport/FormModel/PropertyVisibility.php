@@ -6,7 +6,7 @@ namespace Yii\Extension\FormModel\Tests\TestSupport\FormModel;
 
 use Yii\Extension\FormModel\FormModel;
 
-final class Stub extends FormModel
+final class PropertyVisibility extends FormModel
 {
     public string $public = '';
     protected string $protected = '';

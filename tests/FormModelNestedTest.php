@@ -50,7 +50,7 @@ final class FormModelNestedTest extends TestCase
     public function testGetPlaceHolder(): void
     {
         $formModel = new Nested();
-        $this->assertSame('Type Username or Email.', $formModel->getPlaceHolder('user.login'));
+        $this->assertSame('Write Username or Email.', $formModel->getPlaceHolder('user.login'));
     }
 
     public function testHasException(): void
