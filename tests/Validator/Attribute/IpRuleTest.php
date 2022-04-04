@@ -14,7 +14,7 @@ final class IpRuleTest extends TestCase
     {
         $formModel = new IpRule();
         $this->assertTrue($formModel->load(['IpRule' => ['ip' => '192.168']]));
-        $this->assertFalse($formModel->validateWithAttributes());
+        $this->assertFalse($formModel->validate());
         $this->assertSame(['ip' => ['Must be a valid IP address.']], FormErrorsAttributes::getAll($formModel));
     }
 }

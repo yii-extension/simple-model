@@ -13,7 +13,7 @@ final class HasLengthRuleTest extends TestCase
     public function testAttribute(): void
     {
         $formModel = new HasLengthRule();
-        $this->assertFalse($formModel->validateWithAttributes());
+        $this->assertFalse($formModel->validate());
         $this->assertSame(
             [
                 'hasLengthRule' => [
@@ -24,7 +24,7 @@ final class HasLengthRuleTest extends TestCase
         );
 
         $this->assertTrue($formModel->load(['HasLengthRule' => ['hasLengthRule' => 'al']]));
-        $this->assertFalse($formModel->validateWithAttributes());
+        $this->assertFalse($formModel->validate());
         $this->assertSame(
             [
                 'hasLengthRule' => [
@@ -35,7 +35,7 @@ final class HasLengthRuleTest extends TestCase
         );
 
         $this->assertTrue($formModel->load(['HasLengthRule' => ['hasLengthRule' => 'samdark']]));
-        $this->assertFalse($formModel->validateWithAttributes());
+        $this->assertFalse($formModel->validate());
         $this->assertSame(
             [
                 'hasLengthRule' => [

@@ -13,7 +13,7 @@ final class RequiredRuleTest extends TestCase
     public function testAttribute(): void
     {
         $formModel = new RequiredRule();
-        $this->assertFalse($formModel->validateWithAttributes());
+        $this->assertFalse($formModel->validate());
         $this->assertSame(['required' => ['Value cannot be blank.']], FormErrorsAttributes::getAll($formModel));
     }
 }

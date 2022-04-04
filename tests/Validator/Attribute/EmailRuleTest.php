@@ -13,14 +13,14 @@ final class EmailRuleTest extends TestCase
     public function testAttribute(): void
     {
         $formModel = new EmailRule();
-        $this->assertFalse($formModel->validateWithAttributes());
+        $this->assertFalse($formModel->validate());
         $this->assertSame(
             ['email' => ['This value is not a valid email address.']],
             FormErrorsAttributes::getAll($formModel)
         );
 
         $this->assertTrue($formModel->load(['EmailRule' => ['email' => 'a@']]));
-        $this->assertFalse($formModel->validateWithAttributes());
+        $this->assertFalse($formModel->validate());
         $this->assertSame(
             ['email' => ['This value is not a valid email address.']],
             FormErrorsAttributes::getAll($formModel)
