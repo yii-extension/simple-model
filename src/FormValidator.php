@@ -17,13 +17,13 @@ use function is_object;
  */
 final class FormValidator
 {
-    public function __construct(private FormModel|Model $formModel, private array $rowData)
+    public function __construct(private FormModel|Model $model, private array $rowData)
     {
     }
 
     public function validate(): Result
     {
-        $rules = array_merge($this->formModel->getRulesWithAttributes(), $this->formModel->getRules());
+        $rules = array_merge($this->model->getRulesWithAttributes(), $this->model->getRules());
         $result = $this->validateRules($rules);
         $this->addFormErrors($result);
         return $result;
@@ -32,9 +32,9 @@ final class FormValidator
     private function addFormErrors(Result $result): void
     {
         foreach ($result->getErrorMessagesIndexedByAttribute() as $attribute => $errors) {
-            if ($this->formModel->has($attribute)) {
+            if ($this->model->has($attribute)) {
                 foreach ($errors as $error) {
-                    $this->formModel->error()->add($attribute, $error);
+                    $this->model->error()->add($attribute, $error);
                 }
             }
         }
@@ -42,14 +42,14 @@ final class FormValidator
 
     private function validateRules(iterable $rules): Result
     {
-        $context = new ValidationContext($this->formModel);
+        $context = new ValidationContext($this->model);
         $result = new Result();
 
         /** @psalm-var iterable<string, Rule[]> $rules */
         foreach ($rules as $attribute => $attributeRules) {
             $ruleSet = new RuleSet($attributeRules);
             $tempResult = $ruleSet->validate(
-                $this->formModel->getAttributeValue($attribute),
+                $this->model->getAttributeValue($attribute),
                 $context->withAttribute($attribute)
             );
 
