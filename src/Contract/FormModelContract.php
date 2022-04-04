@@ -66,6 +66,11 @@ interface FormModelContract
     public function getRules(): array;
 
     /**
+     * Return rules using `PHP` attributes.
+     */
+    public function getRulesWithAttributes(): array;
+
+    /**
      * If there is such attribute in the set.
      *
      * @param string $attribute

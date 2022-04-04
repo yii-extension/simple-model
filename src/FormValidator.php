@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yii\Extension\FormModel;
 
-use Yiisoft\Validator\DataSet\AttributeDataSet;
 use Yiisoft\Validator\Result;
 use Yiisoft\Validator\Rule;
 use Yiisoft\Validator\RuleSet;
@@ -24,8 +23,7 @@ final class FormValidator
 
     public function validate(): Result
     {
-        $attributeDataSet = new AttributeDataSet($this->formModel, $this->rowData);
-        $rules = array_merge((array) $attributeDataSet->getRules(), $this->formModel->getRules());
+        $rules = array_merge($this->formModel->getRulesWithAttributes(), $this->formModel->getRules());
         $result = $this->validateRules($rules);
         $this->addFormErrors($result);
         return $result;

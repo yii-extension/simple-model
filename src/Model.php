@@ -11,6 +11,7 @@ use ReflectionNamedType;
 use Yii\Extension\FormModel\Contract\FormErrorsContract;
 use Yii\Extension\FormModel\Contract\FormModelContract;
 use Yiisoft\Strings\Inflector;
+use Yiisoft\Validator\DataSet\AttributeDataSet;
 use Yiisoft\Validator\DataSetInterface;
 
 use function array_key_exists;
@@ -78,6 +79,12 @@ abstract class Model implements DataSetInterface, FormModelContract
     public function getRules(): array
     {
         return [];
+    }
+
+    public function getRulesWithAttributes(): array
+    {
+        $attributeDataSet = new AttributeDataSet($this, $this->rawData);
+        return $attributeDataSet->getRules();
     }
 
     public function has(string $attribute): bool
