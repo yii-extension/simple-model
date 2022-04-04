@@ -23,7 +23,7 @@
   </coverage>
 
   <testsuites>
-    <testsuite name="Form">
+    <testsuite name="Model">
       <directory>./tests</directory>
     </testsuite>
   </testsuites>

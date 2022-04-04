@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Yii\Extension\FormModel\FormModel;
+use Yii\Extension\Model\FormModel;
 
 final class NonNamespaced extends FormModel
 {

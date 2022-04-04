@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\FormModel\Tests\Attribute;
+namespace Yii\Extension\Model\Tests\Attribute;
 
 use PHPUnit\Framework\TestCase;
-use Yii\Extension\FormModel\Attribute\FormErrorsAttributes;
-use Yii\Extension\FormModel\Tests\TestSupport\FormModel\Login;
-use Yii\Extension\FormModel\Tests\TestSupport\TestTrait;
+use Yii\Extension\Model\Attribute\FormErrorsAttributes;
+use Yii\Extension\Model\Tests\TestSupport\FormModel\Login;
+use Yii\Extension\Model\Tests\TestSupport\TestTrait;
 
 final class FormErrorsAttributesTest extends TestCase
 {

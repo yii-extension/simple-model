@@ -2,11 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\FormModel\Contract;
+namespace Yii\Extension\Model\Contract;
 
-use Yiisoft\Validator\DataSetInterface;
-
-interface FormAttributesContract extends DataSetInterface
+interface FormAttributesContract
 {
     /**
      * Return array with names of all attributes
@@ -14,24 +12,6 @@ interface FormAttributesContract extends DataSetInterface
      * @return array
      */
     public function attributes(): array;
-
-    /**
-     * Returns the value for the specified attribute.
-     *
-     * @param string $attribute
-     *
-     * @return mixed
-     */
-    public function getAttributeValue(string $attribute): mixed;
-
-    /**
-     * Returns the value (raw data) for the specified attribute.
-     *
-     * @param string $attribute
-     *
-     * @return mixed
-     */
-    public function getCastValue(string $attribute): mixed;
 
     /**
      * Returns the text label for the specified attribute.
@@ -100,13 +80,4 @@ interface FormAttributesContract extends DataSetInterface
      * @return array attribute placeholder (name => placeholder)
      */
     public function getPlaceholders(): array;
-
-    /**
-     * If there is such attribute in the set.
-     *
-     * @param string $attribute
-     *
-     * @return bool
-     */
-    public function has(string $attribute): bool;
 }

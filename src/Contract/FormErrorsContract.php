@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\FormModel\Contract;
+namespace Yii\Extension\Model\Contract;
 
 interface FormErrorsContract
 {
