@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace Yii\Extension\Model;
 
 use InvalidArgumentException;
-use Yii\Extension\Model\Contract\FormAttributesContract;
 use Yii\Extension\Model\Contract\FormModelContract;
 use Yiisoft\Strings\StringHelper;
-use Yiisoft\Validator\DataSetInterface;
 
-abstract class FormModel extends Model implements DataSetInterface, FormAttributesContract
+abstract class FormModel extends Model implements FormModelContract
 {
     public function getHint(string $attribute): string
     {
