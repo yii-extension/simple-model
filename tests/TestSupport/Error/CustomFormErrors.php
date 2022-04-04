@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\FormModel\Tests\TestSupport\Error;
+namespace Yii\Extension\Model\Tests\TestSupport\Error;
 
-use Yii\Extension\FormModel\Contract\FormErrorsContract;
+use Yii\Extension\Model\Contract\FormErrorsContract;
 
 final class CustomFormErrors implements FormErrorsContract
 {

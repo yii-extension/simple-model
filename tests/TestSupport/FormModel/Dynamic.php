@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\FormModel\Tests\TestSupport\FormModel;
+namespace Yii\Extension\Model\Tests\TestSupport\FormModel;
 
-use Yii\Extension\FormModel\FormModel;
+use Yii\Extension\Model\FormModel;
 use Yiisoft\Arrays\ArrayHelper;
 
 final class Dynamic extends FormModel

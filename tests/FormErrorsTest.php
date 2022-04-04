@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\FormModel\Tests;
+namespace Yii\Extension\Model\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Yii\Extension\FormModel\Tests\TestSupport\FormModel\Login;
+use Yii\Extension\Model\Tests\TestSupport\FormModel\Login;
 
 final class FormErrorsTest extends TestCase
 {

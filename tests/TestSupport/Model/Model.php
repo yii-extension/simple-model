@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\FormModel\Tests\TestSupport\Model;
+namespace Yii\Extension\Model\Tests\TestSupport\Model;
 
-use Yii\Extension\FormModel\Model as AbstractModel;
+use Yii\Extension\Model\Model as AbstractModel;
 use Yiisoft\Validator\Rule\Email;
 use Yiisoft\Validator\Rule\HasLength;
 use Yiisoft\Validator\Rule\Required;

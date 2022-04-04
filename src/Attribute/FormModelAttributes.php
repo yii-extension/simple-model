@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\FormModel\Attribute;
+namespace Yii\Extension\Model\Attribute;
 
 use InvalidArgumentException;
 use UnexpectedValueException;
-use Yii\Extension\FormModel\FormModel;
+use Yii\Extension\Model\FormModel;
 
 final class FormModelAttributes
 {

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\FormModel;
+namespace Yii\Extension\Model;
 
-use Yii\Extension\FormModel\Contract\FormErrorsContract;
+use Yii\Extension\Model\Contract\FormErrorsContract;
 
 use function array_flip;
 use function array_intersect_key;

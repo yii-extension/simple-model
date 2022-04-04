@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\FormModel\Tests\Attribute;
+namespace Yii\Extension\Model\Tests\Attribute;
 
 use PHPUnit\Framework\TestCase;
-use Yii\Extension\FormModel\Attribute\FormModelAttributes;
-use Yii\Extension\FormModel\Contract\FormModelContract;
-use Yii\Extension\FormModel\FormModel;
-use Yii\Extension\FormModel\Tests\TestSupport\FormModel\Login;
+use Yii\Extension\Model\Attribute\FormModelAttributes;
+use Yii\Extension\Model\Contract\FormModelContract;
+use Yii\Extension\Model\FormModel;
+use Yii\Extension\Model\Tests\TestSupport\FormModel\Login;
 
 final class FormModelAttributesTest extends TestCase
 {

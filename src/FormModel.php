@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\FormModel;
+namespace Yii\Extension\Model;
 
 use InvalidArgumentException;
-use Yii\Extension\FormModel\Contract\FormAttributesContract;
-use Yii\Extension\FormModel\Contract\FormModelContract;
+use Yii\Extension\Model\Contract\FormAttributesContract;
+use Yii\Extension\Model\Contract\FormModelContract;
 use Yiisoft\Strings\StringHelper;
 use Yiisoft\Validator\DataSetInterface;
 

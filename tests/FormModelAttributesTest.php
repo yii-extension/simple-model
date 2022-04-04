@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\FormModel\Tests;
+namespace Yii\Extension\Model\Tests;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use StdClass;
-use Yii\Extension\FormModel\Tests\TestSupport\FormModel\Login;
-use Yii\Extension\FormModel\Tests\TestSupport\FormModel\PropertyType;
-use Yii\Extension\FormModel\Tests\TestSupport\FormModel\PropertyVisibility;
+use Yii\Extension\Model\Tests\TestSupport\FormModel\Login;
+use Yii\Extension\Model\Tests\TestSupport\FormModel\PropertyType;
+use Yii\Extension\Model\Tests\TestSupport\FormModel\PropertyVisibility;
 
 final class FormModelAttributesTest extends TestCase
 {
@@ -43,7 +43,7 @@ final class FormModelAttributesTest extends TestCase
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Undefined property: "Yii\Extension\FormModel\Tests\TestSupport\FormModel\PropertyType::noExist".'
+            'Undefined property: "Yii\Extension\Model\Tests\TestSupport\FormModel\PropertyType::noExist".'
         );
         $formModel->getAttributeValue('noExist');
     }

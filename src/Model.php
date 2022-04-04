@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\FormModel;
+namespace Yii\Extension\Model;
 
 use Closure;
 use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionNamedType;
-use Yii\Extension\FormModel\Contract\FormErrorsContract;
-use Yii\Extension\FormModel\Contract\FormModelContract;
+use Yii\Extension\Model\Contract\FormErrorsContract;
+use Yii\Extension\Model\Contract\FormModelContract;
 use Yiisoft\Strings\Inflector;
 use Yiisoft\Validator\DataSet\AttributeDataSet;
 use Yiisoft\Validator\DataSetInterface;
@@ -84,7 +84,7 @@ abstract class Model implements DataSetInterface, FormModelContract
     public function getRulesWithAttributes(): array
     {
         $attributeDataSet = new AttributeDataSet($this, $this->rawData);
-        return $attributeDataSet->getRules();
+        return (array) $attributeDataSet->getRules();
     }
 
     public function has(string $attribute): bool

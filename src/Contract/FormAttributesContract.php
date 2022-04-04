@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\FormModel\Contract;
+namespace Yii\Extension\Model\Contract;
 
 interface FormAttributesContract
 {
@@ -12,15 +12,6 @@ interface FormAttributesContract
      * @return array
      */
     public function attributes(): array;
-
-    /**
-     * Returns the value (raw data) for the specified attribute.
-     *
-     * @param string $attribute
-     *
-     * @return mixed
-     */
-    public function getCastValue(string $attribute): mixed;
 
     /**
      * Returns the text label for the specified attribute.

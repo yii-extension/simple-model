@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\FormModel;
+namespace Yii\Extension\Model;
 
 use Yiisoft\Validator\Result;
 use Yiisoft\Validator\Rule;

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Yiisoft\Form\Tests\Helper;
 
 use PHPUnit\Framework\TestCase;
-use Yii\Extension\FormModel\Model as AbstractModel;
-use Yii\Extension\FormModel\Tests\TestSupport\Error\CustomFormErrors;
-use Yii\Extension\FormModel\Tests\TestSupport\Model\Model;
+use Yii\Extension\Model\Model as AbstractModel;
+use Yii\Extension\Model\Tests\TestSupport\Error\CustomFormErrors;
+use Yii\Extension\Model\Tests\TestSupport\Model\Model;
 use Yiisoft\Validator\Rule\Email;
 use Yiisoft\Validator\Rule\HasLength;
 use Yiisoft\Validator\Rule\Required;
@@ -25,8 +25,10 @@ final class ModelTest extends TestCase
     public function testGetAttributeValue(): void
     {
         $model = new Model();
-        $this->assertSame(null, $model->getAttributeValue('login'));
-        $this->assertSame(null, $model->getAttributeValue('password'));
+        $model->set('login', 'admin');
+        $model->set('password', '123456');
+        $this->assertSame('admin', $model->getAttributeValue('login'));
+        $this->assertSame('123456', $model->getAttributeValue('password'));
     }
 
     public function testGetFormName(): void

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\FormModel\Contract;
+namespace Yii\Extension\Model\Contract;
 
 interface FormModelContract
 {
@@ -10,6 +10,15 @@ interface FormModelContract
      * @return FormErrorsContract Validation errors.
      */
     public function error(): FormErrorsContract;
+
+    /**
+     * Returns the value (raw data) for the specified attribute.
+     *
+     * @param string $attribute
+     *
+     * @return mixed
+     */
+    public function getCastValue(string $attribute): mixed;
 
     /**
      * Returns the form name that this model class should use.

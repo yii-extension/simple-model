@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Yiisoft\Form\Tests\Helper;
 
 use PHPUnit\Framework\TestCase;
-use Yii\Extension\FormModel\Attribute\FormModelAttributes;
-use Yii\Extension\FormModel\Tests\TestSupport\FormModel\Dynamic;
+use Yii\Extension\Model\Attribute\FormModelAttributes;
+use Yii\Extension\Model\Tests\TestSupport\FormModel\Dynamic;
 
 final class HtmlFormTest extends TestCase
 {

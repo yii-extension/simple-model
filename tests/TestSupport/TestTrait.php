@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\FormModel\Tests\TestSupport;
+namespace Yii\Extension\Model\Tests\TestSupport;
 
 use ReflectionException;
 use ReflectionObject;

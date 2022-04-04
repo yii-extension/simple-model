@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Yii\Extension\FormModel\Tests\Validator\Attribute;
+namespace Yii\Extension\Model\Tests\Validator\Attribute;
 
 use PHPUnit\Framework\TestCase;
-use Yii\Extension\FormModel\Attribute\FormErrorsAttributes;
-use Yii\Extension\FormModel\Tests\TestSupport\FormModel\Attribute\NumberRule;
+use Yii\Extension\Model\Attribute\FormErrorsAttributes;
+use Yii\Extension\Model\Tests\TestSupport\FormModel\Attribute\NumberRule;
 
 final class NumberRuleTest extends TestCase
 {
