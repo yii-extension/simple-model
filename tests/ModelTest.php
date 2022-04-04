@@ -12,7 +12,7 @@ use Yiisoft\Validator\Rule\Email;
 use Yiisoft\Validator\Rule\HasLength;
 use Yiisoft\Validator\Rule\Required;
 
-require __DIR__ . '/TestSupport/Model/NonNamespacedForm.php';
+require __DIR__ . '/TestSupport/Model/NonNamespaced.php';
 
 final class ModelTest extends TestCase
 {
@@ -40,8 +40,8 @@ final class ModelTest extends TestCase
         };
         $this->assertSame('', $model->getFormName());
 
-        $model = new \NonNamespacedForm();
-        $this->assertSame('NonNamespacedForm', $model->getFormName());
+        $model = new \NonNamespaced();
+        $this->assertSame('NonNamespaced', $model->getFormName());
     }
 
     public function testGetRules(): void

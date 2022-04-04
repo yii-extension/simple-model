@@ -9,7 +9,7 @@ use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionNamedType;
 use Yii\Extension\Model\Contract\FormErrorsContract;
-use Yii\Extension\Model\Contract\FormModelContract;
+use Yii\Extension\Model\Contract\ModelContract;
 use Yiisoft\Strings\Inflector;
 use Yiisoft\Validator\DataSet\AttributeDataSet;
 use Yiisoft\Validator\DataSetInterface;
@@ -23,7 +23,7 @@ use function str_contains;
 use function strrchr;
 use function substr;
 
-abstract class Model implements DataSetInterface, FormModelContract
+abstract class Model implements DataSetInterface, ModelContract
 {
     private array $attributes;
     private ?FormErrorsContract $formErrors = null;
@@ -210,7 +210,7 @@ abstract class Model implements DataSetInterface, FormModelContract
         [$attribute, $nested] = $this->getNested($attribute);
 
         if ($nested !== null) {
-            /** @var FormModelContract $attributeNestedValue */
+            /** @var ModelContract $attributeNestedValue */
             $attributeNestedValue = $this->getCastValue($attribute);
             /** @var string */
             $result = $attributeNestedValue->$method($nested);
@@ -257,7 +257,7 @@ abstract class Model implements DataSetInterface, FormModelContract
         }
 
         /** @psalm-suppress MixedMethodCall */
-        $getter = static function (FormModelContract $class, string $attribute, ?string $nested): mixed {
+        $getter = static function (ModelContract $class, string $attribute, ?string $nested): mixed {
             return match ($nested) {
                 null => $class->$attribute,
                 default => $class->$attribute->getCastValue($nested),
@@ -275,7 +275,7 @@ abstract class Model implements DataSetInterface, FormModelContract
         [$attribute, $nested] = $this->getNested($attribute);
 
         /** @psalm-suppress MixedMethodCall */
-        $setter = static function (FormModelContract $class, string $attribute, mixed $value, ?string $nested): void {
+        $setter = static function (ModelContract $class, string $attribute, mixed $value, ?string $nested): void {
             match ($nested) {
                 null => $class->$attribute = $value,
                 default => $class->$attribute->set($nested, $value),

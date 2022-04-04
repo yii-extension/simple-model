@@ -4,137 +4,80 @@ declare(strict_types=1);
 
 namespace Yii\Extension\Model\Contract;
 
-interface FormModelContract
+interface FormModelContract extends ModelContract
 {
     /**
-     * @return FormErrorsContract Validation errors.
+     * Return array with names of all attributes
+     *
+     * @return array
      */
-    public function error(): FormErrorsContract;
+    public function attributes(): array;
 
     /**
-     * Returns the value (raw data) for the specified attribute.
+     * Returns the text label for the specified attribute.
      *
-     * @param string $attribute
+     * @param string $attribute the attribute name.
      *
-     * @return mixed
+     * @return string the attribute label.
      */
-    public function getCastValue(string $attribute): mixed;
+    public function getLabel(string $attribute): string;
 
     /**
-     * Returns the form name that this model class should use.
+     * Returns the attribute labels.
      *
-     * The form name is mainly used by {@see \Yiisoft\Form\Helper\HtmlForm} to determine how to name the input
-     * fields for the attributes in a model.
-     * If the form name is "A" and an attribute name is "b", then the corresponding input name would be "A[b]".
-     * If the form name is an empty string, then the input name would be "b".
+     * Attribute labels are mainly used for display purpose. For example, given an attribute `firstName`, we can declare
+     * a label `First Name` which is more user-friendly and can be displayed to end users.
      *
-     * The purpose of the above naming schema is that for forms which contain multiple different models, the attributes
-     * of each model are grouped in sub-arrays of the POST-data, and it is easier to differentiate between them.
+     * By default, an attribute label is generated automatically. This method allows you to explicitly specify attribute
+     * labels.
      *
-     * By default, this method returns the model class name (without the namespace part) as the form name. You may
-     * override it when the model is used in different forms.
+     * Note, in order to inherit labels defined in the parent class, a child class needs to merge the parent labels with
+     * child labels using functions such as `array_merge()`.
      *
-     * @return string the form name of this model class.
+     * @return array attribute labels (name => label)
      *
-     * {@see load()}
+     * {@see getLabel()}
      */
-    public function getFormName(): string;
+    public function getLabels(): array;
 
     /**
-     * Returns the validation rules for attributes.
+     * Returns the text hint for the specified attribute.
      *
-     * Validation rules are used by {@see \Yiisoft\Validator\Validator} to check if attribute values are valid.
-     * Child classes may override this method to declare different validation rules.
+     * @param string $attribute the attribute name.
      *
-     * Each rule is an array with the following structure:
-     *
-     * ```php
-     * public function rules(): array
-     * {
-     *     return [
-     *         'login' => $this->loginRules()
-     *     ];
-     * }
-     *
-     * private function loginRules(): array
-     * {
-     *   return [
-     *       new \Yiisoft\Validator\Rule\Required(),
-     *       (new \Yiisoft\Validator\Rule\HasLength())
-     *       ->min(4)
-     *       ->max(40)
-     *       ->tooShortMessage('Is too short.')
-     *       ->tooLongMessage('Is too long.'),
-     *       new \Yiisoft\Validator\Rule\Email()
-     *   ];
-     * }
-     * ```
-     *
-     * @return array Validation rules.
+     * @return string the attribute hint.
      */
-    public function getRules(): array;
+    public function getHint(string $attribute): string;
 
     /**
-     * Return rules using `PHP` attributes.
+     * Returns the attribute hints.
+     *
+     * Attribute hints are mainly used for display purpose. For example, given an attribute `isPublic`, we can declare
+     * a hint `Whether the post should be visible for not logged-in users`, which provides user-friendly description of
+     * the attribute meaning and can be displayed to end users.
+     *
+     * Unlike label hint will not be generated, if its explicit declaration is omitted.
+     *
+     * Note, in order to inherit hints defined in the parent class, a child class needs to merge the parent hints with
+     * child hints using functions such as `array_merge()`.
+     *
+     * @return array attribute hints (name => hint)
      */
-    public function getRulesWithAttributes(): array;
+    public function getHints(): array;
 
     /**
-     * If there is such attribute in the set.
+     * Returns the text placeholder for the specified attribute.
      *
-     * @param string $attribute
+     * @param string $attribute the attribute name.
      *
-     * @return bool
+     * @return string the attribute placeholder.
      */
-    public function has(string $attribute): bool;
+    public function getPlaceholder(string $attribute): string;
 
     /**
-     * Return whether the form model is empty.
+     * Returns the attribute placeholders.
+     *
+     * @return array attribute placeholder (name => placeholder)
      */
-    public function isEmpty(): bool;
-
-    /**
-     * Populates the model with input data.
-     *
-     * which, with `load()` can be written as:
-     *
-     * ```php
-     * $body = $request->getParsedBody();
-     * $method = $request->getMethod();
-     *
-     * if ($method === Method::POST && $loginForm->load($body)) {
-     *     // handle success
-     * }
-     * ```
-     *
-     * `load()` gets the `'FormName'` from the {@see getFormName()} method (which you may override), unless the
-     * `$formName` parameter is given. If the form name is empty string, `load()` populates the model with the whole of
-     * `$data` instead of `$data['FormName']`.
-     *
-     * @param array $data the data array to load, typically server request attributes.
-     * @param string|null $formName scope from which to get data
-     *
-     * @return bool whether `load()` found the expected form in `$data`.
-     *
-     * @psalm-param array<string, string> $data
-     */
-    public function load(array $data, ?string $formName = null): bool;
-
-    /**
-     * Set specified attribute
-     *
-     * @param string $name of the attribute to set
-     * @param mixed $value
-     */
-    public function set(string $name, mixed $value): void;
-
-    /**
-     * Set custom form errors instance.
-     */
-    public function setFormErrors(FormErrorsContract $formErrors): void;
-
-    /**
-     * Validate the FormModel instance.
-     */
-    public function validate(): bool;
+    public function getPlaceholders(): array;
 }
