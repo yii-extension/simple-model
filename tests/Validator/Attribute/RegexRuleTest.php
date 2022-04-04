@@ -14,7 +14,7 @@ final class RegexRuleTest extends TestCase
     {
         $formModel = new RegexRule();
         $this->assertTrue($formModel->load(['RegexRule' => ['regex' => '??']]));
-        $this->assertFalse($formModel->validateWithAttributes());
+        $this->assertFalse($formModel->validate());
         $this->assertSame(['regex' => ['Value is invalid.']], FormErrorsAttributes::getAll($formModel));
     }
 }

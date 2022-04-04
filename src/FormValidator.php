@@ -19,15 +19,34 @@ use function is_object;
  */
 final class FormValidator
 {
-    public function __construct(private FormModelContract $formModel)
+    public function __construct(private FormModelContract $formModel, private array $rowData)
     {
     }
 
     public function validate(): Result
     {
+        $attributeDataSet = new AttributeDataSet($this->formModel, $this->rowData);
+        $rules = array_merge((array) $attributeDataSet->getRules(), $this->formModel->getRules());
+        $result = $this->validateRules($rules);
+        $this->addFormErrors($result);
+        return $result;
+    }
+
+    private function addFormErrors(Result $result): void
+    {
+        foreach ($result->getErrorMessagesIndexedByAttribute() as $attribute => $errors) {
+            if ($this->formModel->has($attribute)) {
+                foreach ($errors as $error) {
+                    $this->formModel->error()->add($attribute, $error);
+                }
+            }
+        }
+    }
+
+    private function validateRules(iterable $rules): Result
+    {
         $context = new ValidationContext($this->formModel);
         $result = new Result();
-        $rules = $this->formModel->getRules();
 
         /** @psalm-var iterable<string, Rule[]> $rules */
         foreach ($rules as $attribute => $attributeRules) {
@@ -42,53 +61,6 @@ final class FormValidator
             }
         }
 
-        foreach ($result->getErrorMessagesIndexedByAttribute() as $attribute => $errors) {
-            if ($this->formModel->has($attribute)) {
-                $this->addError([$attribute => $errors]);
-            }
-        }
-
         return $result;
-    }
-
-    public function validateWithAttributes(array $rawData): Result
-    {
-        $attributeDataSet = new AttributeDataSet($this->formModel, $rawData);
-        $context = new ValidationContext($this->formModel);
-        $result = new Result();
-        $rules = $attributeDataSet->getRules();
-
-        /** @psalm-var iterable<string, Rule[]> $rules */
-        foreach ($rules as $attribute => $attributeRules) {
-            $ruleSet = new RuleSet($attributeRules);
-            $tempResult = $ruleSet->validate(
-                $this->formModel->getAttributeValue($attribute),
-                $context->withAttribute($attribute)
-            );
-
-            foreach ($tempResult->getErrors() as $error) {
-                $result->addError($error->getMessage(), [$attribute, ...$error->getValuePath()]);
-            }
-        }
-
-        foreach ($result->getErrorMessagesIndexedByAttribute() as $attribute => $errors) {
-            if ($this->formModel->has($attribute)) {
-                $this->addError([$attribute => $errors]);
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * @psalm-param array<string, list<string>> $items
-     */
-    private function addError(array $items): void
-    {
-        foreach ($items as $attribute => $errors) {
-            foreach ($errors as $error) {
-                $this->formModel->error()->add($attribute, $error);
-            }
-        }
     }
 }

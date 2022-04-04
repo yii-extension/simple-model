@@ -114,9 +114,4 @@ interface FormModelContract extends FormAttributesContract
      * Validate the FormModel instance.
      */
     public function validate(): bool;
-
-    /**
-     * Validate the FormModel instance with attibutes.
-     */
-    public function validateWithAttributes(): bool;
 }

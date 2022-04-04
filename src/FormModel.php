@@ -230,12 +230,7 @@ abstract class FormModel implements FormModelContract
 
     public function validate(): bool
     {
-        return (new FormValidator($this))->validate()->isValid();
-    }
-
-    public function validateWithAttributes(): bool
-    {
-        return (new FormValidator($this))->validateWithAttributes($this->rawData)->isValid();
+        return (new FormValidator($this, $this->rawData))->validate()->isValid();
     }
 
     /**

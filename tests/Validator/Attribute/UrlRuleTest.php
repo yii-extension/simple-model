@@ -13,7 +13,7 @@ final class UrlRuleTest extends TestCase
     public function testAttribute(): void
     {
         $formModel = new UrlRule();
-        $this->assertFalse($formModel->validateWithAttributes());
+        $this->assertFalse($formModel->validate());
         $this->assertSame(['url' => ['This value is not a valid URL.']], FormErrorsAttributes::getAll($formModel));
     }
 }

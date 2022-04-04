@@ -13,11 +13,11 @@ final class InRangeRuleTest extends TestCase
     public function testAttribute(): void
     {
         $formModel = new InRangeRule();
-        $this->assertFalse($formModel->validateWithAttributes());
+        $this->assertFalse($formModel->validate());
         $this->assertSame(['inRange' => ['This value is invalid.']], FormErrorsAttributes::getAll($formModel));
 
         $this->assertTrue($formModel->load(['InRangeRule' => ['inRange' => '11']]));
-        $this->assertFalse($formModel->validateWithAttributes());
+        $this->assertFalse($formModel->validate());
         $this->assertSame(['inRange' => ['This value is invalid.']], FormErrorsAttributes::getAll($formModel));
     }
 }
