@@ -30,7 +30,9 @@ final class FormErrorsAttributesTest extends TestCase
         $this->assertTrue($formModel->load($this->data));
         $this->assertFalse($formModel->validate());
         $this->assertSame($this->expected, FormErrorsAttributes::getAll($formModel));
-        $this->assertEmpty($formModel->error()->clear());
+
+        $formModel->error()->clear();
+        $this->assertEmpty(FormErrorsAttributes::getAll($formModel));
     }
 
     public function testClearForAttribute(): void
@@ -39,7 +41,8 @@ final class FormErrorsAttributesTest extends TestCase
         $this->assertTrue($formModel->load($this->data));
         $this->assertFalse($formModel->validate());
         $this->assertSame($this->expected, FormErrorsAttributes::getAll($formModel));
-        $this->assertEmpty($formModel->error()->clear('login'));
+        $formModel->error()->clear('login');
+        $this->assertEmpty(FormErrorsAttributes::getAll($formModel));
         $this->assertSame(['password' => ['Is too short.']], FormErrorsAttributes::getAll($formModel));
     }
 

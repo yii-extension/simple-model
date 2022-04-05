@@ -2,15 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Form\Tests\Helper;
+namespace Yii\Extension\Model\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Yii\Extension\Model\Model as AbstractModel;
 use Yii\Extension\Model\Tests\TestSupport\Error\CustomFormErrors;
 use Yii\Extension\Model\Tests\TestSupport\Model\Model;
+use Yii\Extension\Model\Tests\TestSupport\Model\Rules;
+use Yiisoft\Validator\Rule;
 use Yiisoft\Validator\Rule\Email;
 use Yiisoft\Validator\Rule\HasLength;
 use Yiisoft\Validator\Rule\Required;
+use Yiisoft\Validator\Validator;
 
 require __DIR__ . '/TestSupport/Model/NonNamespaced.php';
 
@@ -53,6 +56,7 @@ final class ModelTest extends TestCase
     public function testGetRulesWithAttributes(): void
     {
         $model = new Model();
+        /** @psalm-var Rule[][] $rules */
         $rules = $model->getRulesWithAttributes();
         $this->assertIsArray($rules);
         $this->assertInstanceOf(Required::class, $rules['login'][0]);
@@ -167,5 +171,24 @@ final class ModelTest extends TestCase
         $model = new Model();
         $model->setFormErrors($formErrors);
         $this->assertSame($formErrors, $model->error());
+    }
+
+    public function testSetValidator(): void
+    {
+        $validator = new Validator();
+        $model = new Model();
+        $model->setValidator($validator);
+        $this->assertSame($validator, $model->validator());
+    }
+
+    public function testSetValidatorValidate(): void
+    {
+        $validator = new Validator();
+        $model = new Rules();
+        $model->setValidator($validator);
+        $model->set('firstName', 'joe');
+        $model->set('lastName', 'doe');
+        $this->assertTrue($model->validate());
+        $this->assertSame([], $model->error()->getAll());
     }
 }

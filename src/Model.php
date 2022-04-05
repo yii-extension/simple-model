@@ -12,7 +12,9 @@ use Yii\Extension\Model\Contract\FormErrorsContract;
 use Yii\Extension\Model\Contract\ModelContract;
 use Yiisoft\Strings\Inflector;
 use Yiisoft\Validator\DataSet\AttributeDataSet;
-use Yiisoft\Validator\DataSetInterface;
+use Yiisoft\Validator\Result;
+use Yiisoft\Validator\Rule;
+use Yiisoft\Validator\ValidatorInterface;
 
 use function array_key_exists;
 use function array_keys;
@@ -23,13 +25,13 @@ use function str_contains;
 use function strrchr;
 use function substr;
 
-abstract class Model implements DataSetInterface, ModelContract
+abstract class Model implements ModelContract
 {
     private array $attributes;
     private ?FormErrorsContract $formErrors = null;
     private ?Inflector $inflector = null;
-    /** @psalm-var array<string, string|array> */
     private array $rawData = [];
+    private ?ValidatorInterface $validator = null;
 
     public function __construct()
     {
@@ -81,10 +83,10 @@ abstract class Model implements DataSetInterface, ModelContract
         return [];
     }
 
-    public function getRulesWithAttributes(): array
+    public function getRulesWithAttributes(): iterable
     {
         $attributeDataSet = new AttributeDataSet($this, $this->rawData);
-        return (array) $attributeDataSet->getRules();
+        return $attributeDataSet->getRules();
     }
 
     public function has(string $attribute): bool
@@ -104,8 +106,6 @@ abstract class Model implements DataSetInterface, ModelContract
      * @param string|null $formName
      *
      * @return bool
-     *
-     * @psalm-param array<string, string|array> $data
      */
     public function load(array $data, ?string $formName = null): bool
     {
@@ -150,6 +150,11 @@ abstract class Model implements DataSetInterface, ModelContract
         $this->formErrors = $formErrors;
     }
 
+    public function setValidator(ValidatorInterface $validator): void
+    {
+        $this->validator = $validator;
+    }
+
     public function sets(array $data): void
     {
         /**
@@ -169,7 +174,19 @@ abstract class Model implements DataSetInterface, ModelContract
 
     public function validate(): bool
     {
-        return (new FormValidator($this, $this->rawData))->validate()->isValid();
+        /** @psalm-var iterable<string, array<array-key, Rule>> */
+        $rules = $this->getRulesWithAttributes();
+        $result = $this->validator()->validate($this, $rules);
+        $this->addErrors($result);
+        return $result->isValid();
+    }
+
+    public function validator(): ValidatorInterface
+    {
+        return match (empty($this->validator)) {
+            true => $this->validator = new FormValidator(),
+            false => $this->validator,
+        };
     }
 
     /**
@@ -217,6 +234,17 @@ abstract class Model implements DataSetInterface, ModelContract
         }
 
         return $result;
+    }
+
+    private function addErrors(Result $result): void
+    {
+        foreach ($result->getErrorMessagesIndexedByAttribute() as $attribute => $errors) {
+            if ($this->has($attribute)) {
+                foreach ($errors as $error) {
+                    $this->error()->add($attribute, $error);
+                }
+            }
+        }
     }
 
     /**

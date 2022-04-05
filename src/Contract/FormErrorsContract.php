@@ -15,6 +15,13 @@ interface FormErrorsContract
     public function add(string $attribute, string $error): void;
 
     /**
+     * Add errors for the model instance.
+     *
+     * @psalm-param array<string, array<array-key, string>> $values
+     */
+    public function addErrors(array $values): void;
+
+    /**
      * Removes error for attributes.
      *
      * @param string|null $attribute Attribute name.
@@ -91,7 +98,7 @@ interface FormErrorsContract
      * {@see get()}
      * {@see getFirsts(){}
      */
-    public function getSummary(array $onlyAttributes): array;
+    public function getSummary(array $onlyAttributes = []): array;
 
     /**
      * Returns the first error of every attribute in the collection.

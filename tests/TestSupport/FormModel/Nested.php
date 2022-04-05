@@ -36,7 +36,7 @@ final class Nested extends FormModel
     public function getRules(): array
     {
         return [
-            'id' => Required::rule(),
+            'id' => new Required(),
         ];
     }
 }

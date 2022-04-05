@@ -18,14 +18,14 @@ final class FormErrorsTest extends TestCase
         $this->assertSame($errorMessage, $formModel->error()->getFirst('password'));
     }
 
-    public function testAddMultipleErrors(): void
+    public function testAddErrors(): void
     {
         $formModel = new Login();
         $errorMessage = ['password' => ['0' => 'Invalid password.']];
         $formModel->error()->clear();
         $this->assertEmpty($formModel->error()->getFirst('password'));
 
-        $formModel->error()->addMultiple($errorMessage);
+        $formModel->error()->addErrors($errorMessage);
         $this->assertTrue($formModel->error()->has('password'));
         $this->assertSame('Invalid password.', $formModel->error()->getFirst('password'));
     }

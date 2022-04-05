@@ -23,8 +23,7 @@ final class FormErrors implements FormErrorsContract
         $this->attributesErrors[$attribute][] = $error;
     }
 
-    /** @psalm-param array<string, array<array-key, string>> $values */
-    public function addMultiple(array $values): void
+    public function addErrors(array $values): void
     {
         $this->attributesErrors = $values;
     }

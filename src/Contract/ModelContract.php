@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Yii\Extension\Model\Contract;
 
 use Yiisoft\Validator\DataSetInterface;
+use Yiisoft\Validator\RulesProviderInterface;
 
-interface ModelContract extends DataSetInterface
+interface ModelContract extends DataSetInterface, RulesProviderInterface
 {
     /**
      * @return FormErrorsContract Validation errors.
@@ -25,8 +26,8 @@ interface ModelContract extends DataSetInterface
     /**
      * Returns the form name that this model class should use.
      *
-     * The form name is mainly used by {@see \Yiisoft\Form\Helper\HtmlForm} to determine how to name the input
-     * fields for the attributes in a model.
+     * The form name is mainly used by {@see \Yii\Extension\Model\FormModelAttributes} to determine how to name the
+     * input fields for the attributes in a model.
      * If the form name is "A" and an attribute name is "b", then the corresponding input name would be "A[b]".
      * If the form name is an empty string, then the input name would be "b".
      *
@@ -43,43 +44,9 @@ interface ModelContract extends DataSetInterface
     public function getFormName(): string;
 
     /**
-     * Returns the validation rules for attributes.
-     *
-     * Validation rules are used by {@see \Yiisoft\Validator\Validator} to check if attribute values are valid.
-     * Child classes may override this method to declare different validation rules.
-     *
-     * Each rule is an array with the following structure:
-     *
-     * ```php
-     * public function rules(): array
-     * {
-     *     return [
-     *         'login' => $this->loginRules()
-     *     ];
-     * }
-     *
-     * private function loginRules(): array
-     * {
-     *   return [
-     *       new \Yiisoft\Validator\Rule\Required(),
-     *       (new \Yiisoft\Validator\Rule\HasLength())
-     *       ->min(4)
-     *       ->max(40)
-     *       ->tooShortMessage('Is too short.')
-     *       ->tooLongMessage('Is too long.'),
-     *       new \Yiisoft\Validator\Rule\Email()
-     *   ];
-     * }
-     * ```
-     *
-     * @return array Validation rules.
-     */
-    public function getRules(): array;
-
-    /**
      * Return rules using `PHP` attributes.
      */
-    public function getRulesWithAttributes(): array;
+    public function getRulesWithAttributes(): iterable;
 
     /**
      * If there is such attribute in the set.

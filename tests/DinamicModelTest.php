@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Form\Tests\Helper;
+namespace Yii\Extension\Model\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Yii\Extension\Model\Attribute\FormModelAttributes;
 use Yii\Extension\Model\Tests\TestSupport\FormModel\Dynamic;
 
-final class HtmlFormTest extends TestCase
+final class DinamicModelTest extends TestCase
 {
     public function dynamicAttributesProvider(): array
     {
@@ -38,6 +38,7 @@ final class HtmlFormTest extends TestCase
         $keys = array_column($fields, 'name');
         $form = new Dynamic(array_fill_keys($keys, null));
 
+        /** @psalm-var string[][] $fields */
         foreach ($fields as $field) {
             $inputName = FormModelAttributes::getInputName($form, $field['name']);
             $this->assertSame($field['expected'], $inputName);

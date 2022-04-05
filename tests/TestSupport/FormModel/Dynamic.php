@@ -11,6 +11,7 @@ final class Dynamic extends FormModel
 {
     public function __construct(private array $attributes = [])
     {
+        parent::__construct();
     }
 
     public function has(string $attribute): bool

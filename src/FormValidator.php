@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace Yii\Extension\Model;
 
+use Yiisoft\Validator\DataSet\ArrayDataSet;
+use Yiisoft\Validator\DataSet\ScalarDataSet;
+use Yiisoft\Validator\DataSetInterface;
 use Yiisoft\Validator\Result;
 use Yiisoft\Validator\Rule;
 use Yiisoft\Validator\RuleSet;
+use Yiisoft\Validator\RulesProviderInterface;
 use Yiisoft\Validator\ValidationContext;
+use Yiisoft\Validator\ValidatorInterface;
 
 use function is_array;
 use function is_object;
@@ -15,41 +20,28 @@ use function is_object;
 /**
  * Validator validates {@link FormModel} against rules set for data set attributes.
  */
-final class FormValidator
+final class FormValidator implements ValidatorInterface
 {
-    public function __construct(private FormModel|Model $model, private array $rowData)
+    public function __construct()
     {
     }
 
-    public function validate(): Result
+    public function validate($data, iterable $rules = []): Result
     {
-        $rules = array_merge($this->model->getRulesWithAttributes(), $this->model->getRules());
-        $result = $this->validateRules($rules);
-        $this->addFormErrors($result);
-        return $result;
-    }
+        $data = $this->normalizeDataSet($data);
 
-    private function addFormErrors(Result $result): void
-    {
-        foreach ($result->getErrorMessagesIndexedByAttribute() as $attribute => $errors) {
-            if ($this->model->has($attribute)) {
-                foreach ($errors as $error) {
-                    $this->model->error()->add($attribute, $error);
-                }
-            }
+        if ($data instanceof RulesProviderInterface) {
+            $rules = array_merge((array) $data->getRules(), (array) $rules);
         }
-    }
 
-    private function validateRules(iterable $rules): Result
-    {
-        $context = new ValidationContext($this->model);
+        $context = new ValidationContext($data);
         $result = new Result();
 
         /** @psalm-var iterable<string, Rule[]> $rules */
         foreach ($rules as $attribute => $attributeRules) {
             $ruleSet = new RuleSet($attributeRules);
             $tempResult = $ruleSet->validate(
-                $this->model->getAttributeValue($attribute),
+                $data->getAttributeValue($attribute),
                 $context->withAttribute($attribute)
             );
 
@@ -59,5 +51,18 @@ final class FormValidator
         }
 
         return $result;
+    }
+
+    private function normalizeDataSet(mixed $data): DataSetInterface
+    {
+        if ($data instanceof DataSetInterface) {
+            return $data;
+        }
+
+        if (is_object($data) || is_array($data)) {
+            return new ArrayDataSet((array) $data);
+        }
+
+        return new ScalarDataSet($data);
     }
 }
