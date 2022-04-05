@@ -8,8 +8,8 @@ use Closure;
 use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionNamedType;
-use Yii\Extension\Model\Contract\FormErrorsContract;
 use Yii\Extension\Model\Contract\ModelContract;
+use Yii\Extension\Model\Contract\ModelErrorsContract;
 use Yiisoft\Strings\Inflector;
 use Yiisoft\Validator\DataSet\AttributeDataSet;
 use Yiisoft\Validator\Result;
@@ -27,7 +27,7 @@ use function substr;
 
 abstract class Model implements ModelContract
 {
-    private ?FormErrorsContract $formErrors = null;
+    private ?ModelErrorsContract $modelErrors = null;
     private ?Inflector $inflector = null;
     private ModelType $modelTypes;
     private array $rawData = [];
@@ -40,14 +40,14 @@ abstract class Model implements ModelContract
 
     public function attributes(): array
     {
-        return array_keys($this->modelTypes->getAttributes());
+        return array_keys($this->modelTypes->attributes());
     }
 
-    public function error(): FormErrorsContract
+    public function error(): ModelErrorsContract
     {
-        return match (empty($this->formErrors)) {
-            true => $this->formErrors = new FormErrors(),
-            false => $this->formErrors,
+        return match (empty($this->modelErrors)) {
+            true => $this->modelErrors = new ModelErrors(),
+            false => $this->modelErrors,
         };
     }
 
@@ -89,16 +89,11 @@ abstract class Model implements ModelContract
         return $attributeDataSet->getRules();
     }
 
-    public function getTypes(): ModelType
-    {
-        return $this->modelTypes;
-    }
-
     public function has(string $attribute): bool
     {
         [$attribute, $nested] = $this->getNested($attribute);
 
-        return $nested !== null || array_key_exists($attribute, $this->modelTypes->getAttributes());
+        return $nested !== null || array_key_exists($attribute, $this->modelTypes->attributes());
     }
 
     public function isEmpty(): bool
@@ -132,9 +127,9 @@ abstract class Model implements ModelContract
         return $this->rawData !== [];
     }
 
-    public function setFormErrors(FormErrorsContract $formErrors): void
+    public function setFormErrors(ModelErrorsContract $modelErrors): void
     {
-        $this->formErrors = $formErrors;
+        $this->modelErrors = $modelErrors;
     }
 
     public function setValidator(ValidatorInterface $validator): void
@@ -169,6 +164,11 @@ abstract class Model implements ModelContract
         }
     }
 
+    public function types(): ModelType
+    {
+        return $this->modelTypes;
+    }
+
     public function validate(): bool
     {
         /** @psalm-var iterable<string, array<array-key, Rule>> */
@@ -181,7 +181,7 @@ abstract class Model implements ModelContract
     public function validator(): ValidatorInterface
     {
         return match (empty($this->validator)) {
-            true => $this->validator = new FormValidator(),
+            true => $this->validator = new ModelValidator(),
             false => $this->validator,
         };
     }
@@ -233,7 +233,7 @@ abstract class Model implements ModelContract
         }
 
         [$attribute, $nested] = explode('.', $attribute, 2);
-        $attributeNested = $this->modelTypes->getAttribute($attribute);
+        $attributeNested = $this->modelTypes->getType($attribute);
 
         if (!is_subclass_of($attributeNested, self::class)) {
             throw new InvalidArgumentException("Attribute \"$attribute\" is not a nested attribute.");

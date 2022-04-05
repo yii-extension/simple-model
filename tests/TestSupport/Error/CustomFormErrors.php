@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Yii\Extension\Model\Tests\TestSupport\Error;
 
-use Yii\Extension\Model\Contract\FormErrorsContract;
+use Yii\Extension\Model\Contract\ModelErrorsContract;
 
-final class CustomFormErrors implements FormErrorsContract
+final class CustomFormErrors implements ModelErrorsContract
 {
     /** @psalm-param array<string, array<array-key, string>> $attributesErrors */
     public function __construct(private array $attributesErrors = [])

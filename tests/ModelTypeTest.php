@@ -15,15 +15,15 @@ final class ModelTypeTest extends TestCase
         $model = new PropertyType();
         $this->assertSame(
             ['array' => 'array', 'bool' => 'bool', 'float' => 'float', 'int' => 'int', 'object' => 'object', 'string' => 'string' ],
-            $model->getTypes()->getAttributes()
+            $model->types()->attributes()
         );
     }
 
     public function testPhpTypeCast(): void
     {
         $model = new PropertyType();
-        $this->assertSame('1.1', $model->getTypes()->phpTypeCast('string', 1.1));
-        $this->assertSame(1.1, $model->getTypes()->phpTypeCast('float', '1.1'));
+        $this->assertSame('1.1', $model->types()->phpTypeCast('string', 1.1));
+        $this->assertSame(1.1, $model->types()->phpTypeCast('float', '1.1'));
     }
 
     public function testPropertyStringable(): void

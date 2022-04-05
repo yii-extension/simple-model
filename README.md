@@ -19,6 +19,53 @@
 composer require yii-extension/simple-model
 ```
 
+### Usage
+
+You can create two types of classes, they are `Model::class` and `FormModel::class` through inheritance.
+
+`Model::class` is the base class for all models, defined methods are:
+
+a. `attributes()` - returns the list names of attributes.
+b. `errors()` - returns instance of `ModelErrors::class`:
+  b.1. `add(string $attribute, string $error)` - adds an error to the specified attribute.
+  b.2. `addErrors(array $values)` - adds the errors for model instance.
+  b.3. `clear(?string $attribute = null)` - removes errors for the specified attribute, or attribute is `null` remove all attributes.
+  b.4. `get(string $attribute)` - returns the error message for the specified attribute.
+  b.5. `getAll()` - returns all errors.
+  b.6. `getFirst(string $attribute)` - returns the first error message for the specified attribute.
+  b.7. `getFirsts()` - returns the first error message for all attributes.
+  b.8. `getSummary()` -  returns errors for all attributes as a one-dimensional array.
+  b.9. `getSummaryFirst()` - returns the first error message for all attributes as a one-dimensional array.
+  b.10. `has(?string $attribute = null)` - returns a value indicating whether there is any validation error, use `null` to check all attributes.
+c. `getAttributeValue(string $attribute)` - returns the attribute value.
+d. `getCastValue(string $attribute)` - returns the attribute `PHP` type cast value.
+e. `getFormName()` - returns the form name.
+f. `getRules()` - returns the validation rules.
+g. `getRulesWithAttributes` - returns the validation rules with `PHP` attributes.
+h. `has(string $attribute)` - returns whether the attribute exists.
+i. `isEmpty()` - returns whether the model instance is empty.
+j. `load(array $data, ?string $formName = null)` - loads the model with the given data.
+k. `setFormErrors(ModelErrorsContract $ModelErrors)` - sets custom class for `ModelErrors::class`.
+l. `setValidator(ValidatorInterface $validator)` - sets custom class for `ValidatorInterface::class`.
+m. `setValue(string $name, mixed $value)` - sets the attribute value.
+n. `setValues(array $values)` - sets the attribute values for model instance.
+o. `types()` - returns instance of `ModelTypes::class`.
+  o.1. `attributes` - returns the list names of attributes with `PHP` types.
+  o.2. `getType(string $attribute)` - returns the attribute type.
+  o.3. `phpTypeCast(string $name, mixed $value)` - returns the attribute `PHP` type cast value.
+p. `validate()` - validates the model instance.
+q. `validator()` - returns instance of `ValidatorInterface::class`.
+
+`FormModel::class` is the base class for all form models, defined methods are:
+
+a. `getHint(string $attribute)` - returns the hint for the attribute.
+b. `getHints()` - returns the hints for all attributes.
+c. `getLabel(string $attribute)` - returns the label for the attribute.
+d. `getLabels()` - returns the labels for all attributes.
+e. `getPlaceholder(string $attribute)` - returns the placeholder for the attribute.
+f. `getPlaceholders()` - returns the placeholders for all attributes.
+
+
 ### Unit testing
 
 The package is tested with [PHPUnit](https://phpunit.de/). To run tests:
@@ -32,7 +79,7 @@ The package is tested with [PHPUnit](https://phpunit.de/). To run tests:
 The package tests are checked with [Infection](https://infection.github.io/) mutation framework. To run it:
 
 ```shell
-./vendor/bin/infection
+./vendor/bin/roave-infection-static-analysis-plugin -j2 --ignore-msi-with-no-mutations --only-covered
 ```
 
 ## Static analysis

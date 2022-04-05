@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yii\Extension\Model\Contract;
 
-interface FormErrorsContract
+interface ModelErrorsContract
 {
     /**
      * Add an error for the specified attribute.

@@ -20,7 +20,7 @@ use function is_object;
 /**
  * Validator validates {@link FormModel} against rules set for data set attributes.
  */
-final class FormValidator implements ValidatorInterface
+final class ModelValidator implements ValidatorInterface
 {
     public function __construct()
     {

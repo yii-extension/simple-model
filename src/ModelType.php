@@ -23,17 +23,17 @@ final class ModelType
         $this->attributes = $this->collectAttributes();
     }
 
-    public function getAttribute(string $attribute): string
+    public function attributes(): array
+    {
+        return $this->attributes;
+    }
+
+    public function getType(string $attribute): string
     {
         return match (isset($this->attributes[$attribute]) && is_string($this->attributes[$attribute])) {
             true => $this->attributes[$attribute],
             false => '',
         };
-    }
-
-    public function getAttributes(): array
-    {
-        return $this->attributes;
     }
 
     /**

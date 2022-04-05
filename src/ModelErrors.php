@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Yii\Extension\Model;
 
-use Yii\Extension\Model\Contract\FormErrorsContract;
+use Yii\Extension\Model\Contract\ModelErrorsContract;
 
 use function array_flip;
 use function array_intersect_key;
 use function array_merge;
 use function reset;
 
-final class FormErrors implements FormErrorsContract
+final class ModelErrors implements ModelErrorsContract
 {
     /** @psalm-param array<string, array<array-key, string>> $attributesErrors */
     public function __construct(private array $attributesErrors = [])

@@ -11,9 +11,9 @@ use Yiisoft\Validator\RulesProviderInterface;
 interface ModelContract extends DataSetInterface, RulesProviderInterface
 {
     /**
-     * @return FormErrorsContract Validation errors.
+     * @return ModelErrorsContract The errors model instance.
      */
-    public function error(): FormErrorsContract;
+    public function error(): ModelErrorsContract;
 
     /**
      * Returns the value (raw data) for the specified attribute.
@@ -48,11 +48,6 @@ interface ModelContract extends DataSetInterface, RulesProviderInterface
      * Return rules using `PHP` attributes.
      */
     public function getRulesWithAttributes(): iterable;
-
-    /**
-     * Returns type for attributes of the model instance.
-     */
-    public function getTypes(): ModelType;
 
     /**
      * If there is such attribute in the set.
@@ -113,7 +108,12 @@ interface ModelContract extends DataSetInterface, RulesProviderInterface
     /**
      * Set custom form errors instance.
      */
-    public function setFormErrors(FormErrorsContract $formErrors): void;
+    public function setFormErrors(ModelErrorsContract $modelErrors): void;
+
+    /**
+     * Returns type for attributes of the model instance.
+     */
+    public function types(): ModelType;
 
     /**
      * Validate the FormModel instance.
