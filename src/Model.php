@@ -27,20 +27,20 @@ use function substr;
 
 abstract class Model implements ModelContract
 {
-    private array $attributes;
     private ?FormErrorsContract $formErrors = null;
     private ?Inflector $inflector = null;
+    private ModelType $modelTypes;
     private array $rawData = [];
     private ?ValidatorInterface $validator = null;
 
     public function __construct()
     {
-        $this->attributes = $this->collectAttributes();
+        $this->modelTypes = new ModelType($this);
     }
 
     public function attributes(): array
     {
-        return array_keys($this->attributes);
+        return array_keys($this->modelTypes->getAttributes());
     }
 
     public function error(): FormErrorsContract
@@ -89,11 +89,16 @@ abstract class Model implements ModelContract
         return $attributeDataSet->getRules();
     }
 
+    public function getTypes(): ModelType
+    {
+        return $this->modelTypes;
+    }
+
     public function has(string $attribute): bool
     {
         [$attribute, $nested] = $this->getNested($attribute);
 
-        return $nested !== null || array_key_exists($attribute, $this->attributes);
+        return $nested !== null || array_key_exists($attribute, $this->modelTypes->getAttributes());
     }
 
     public function isEmpty(): bool
@@ -141,18 +146,10 @@ abstract class Model implements ModelContract
     {
         [$realName] = $this->getNested($name);
 
-        if (isset($this->attributes[$realName])) {
-            /** @var mixed */
-            $value = match ($this->attributes[$realName]) {
-                'bool' => (bool) $value,
-                'float' => (float) $value,
-                'int' => (int) $value,
-                'string' => (string) $value,
-                default => $value,
-            };
+        /** @var mixed */
+        $valueTypeCast = $this->modelTypes->phpTypeCast($realName, $value);
 
-            $this->writeProperty($name, $value);
-        }
+        $this->writeProperty($name, $valueTypeCast);
     }
 
     public function setValues(array $data): void
@@ -187,29 +184,6 @@ abstract class Model implements ModelContract
             true => $this->validator = new FormValidator(),
             false => $this->validator,
         };
-    }
-
-    /**
-     * Returns the list of attribute types indexed by attribute names.
-     *
-     * By default, this method returns all non-static properties of the class.
-     *
-     * @return array list of attribute types indexed by attribute names.
-     */
-    protected function collectAttributes(): array
-    {
-        $class = new ReflectionClass($this);
-        $attributes = [];
-
-        foreach ($class->getProperties() as $property) {
-            if ($property->isStatic() === false) {
-                /** @var ReflectionNamedType|null $type */
-                $type = $property->getType();
-                $attributes[$property->getName()] = $type !== null ? $type->getName() : '';
-            }
-        }
-
-        return $attributes;
     }
 
     protected function getInflector(): Inflector
@@ -259,9 +233,7 @@ abstract class Model implements ModelContract
         }
 
         [$attribute, $nested] = explode('.', $attribute, 2);
-
-        /** @var string */
-        $attributeNested = $this->attributes[$attribute] ?? '';
+        $attributeNested = $this->modelTypes->getAttribute($attribute);
 
         if (!is_subclass_of($attributeNested, self::class)) {
             throw new InvalidArgumentException("Attribute \"$attribute\" is not a nested attribute.");

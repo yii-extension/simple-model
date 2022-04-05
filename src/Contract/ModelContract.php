@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yii\Extension\Model\Contract;
 
+use Yii\Extension\Model\ModelType;
 use Yiisoft\Validator\DataSetInterface;
 use Yiisoft\Validator\RulesProviderInterface;
 
@@ -47,6 +48,11 @@ interface ModelContract extends DataSetInterface, RulesProviderInterface
      * Return rules using `PHP` attributes.
      */
     public function getRulesWithAttributes(): iterable;
+
+    /**
+     * Returns type for attributes of the model instance.
+     */
+    public function getTypes(): ModelType;
 
     /**
      * If there is such attribute in the set.
