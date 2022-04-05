@@ -19,52 +19,13 @@
 composer require yii-extension/simple-model
 ```
 
-### Usage
+## Usage
 
 You can create two types of classes, they are `Model::class` and `FormModel::class` through inheritance.
 
-`Model::class` is the base class for all models, defined methods are:
+[Model::class](/docs/Model.md) is the base class for all models.
 
-- `attributes()` - returns the list names of attributes.
-- `errors()` - returns instance of `ModelErrors::class`:
-  - `add(string $attribute, string $error)` - adds an error to the specified attribute.
-  - `addErrors(array $values)` - adds the errors for model instance.
-  - `clear(?string $attribute = null)` - removes errors for the specified attribute, or attribute is `null` remove all attributes.
-  - `get(string $attribute)` - returns the error message for the specified attribute.
-  - `getAll()` - returns all errors.
-  - `getFirst(string $attribute)` - returns the first error message for the specified attribute.
-  - `getFirsts()` - returns the first error message for all attributes.
-  - `getSummary()` -  returns errors for all attributes as a one-dimensional array.
-  - `getSummaryFirst()` - returns the first error message for all attributes as a one-dimensional array.
-  - `has(?string $attribute = null)` - returns a value indicating whether there is any validation error, use `null` to check all attributes.
-- `getAttributeValue(string $attribute)` - returns the attribute value.
-- `getCastValue(string $attribute)` - returns the attribute `PHP` type cast value.
-- `getFormName()` - returns the form name.
-- `getRules()` - returns the validation rules.
-- `getRulesWithAttributes` - returns the validation rules with `PHP` attributes.
-- `has(string $attribute)` - returns whether the attribute exists.
-- `isEmpty()` - returns whether the model instance is empty.
-- `load(array $data, ?string $formName = null)` - loads the model with the given data.
-- `setFormErrors(ModelErrorsContract $ModelErrors)` - sets custom class for `ModelErrors::class`.
-- `setValidator(ValidatorInterface $validator)` - sets custom class for `ValidatorInterface::class`.
-- `setValue(string $name, mixed $value)` - sets the attribute value.
-- `setValues(array $values)` - sets the attribute values for model instance.
-- `types()` - returns instance of `ModelTypes::class`.
-  - `attributes` - returns the list names of attributes with `PHP` types.
-  - `getType(string $attribute)` - returns the attribute type.
-  - `phpTypeCast(string $name, mixed $value)` - returns the attribute `PHP` type cast value.
-- `validate()` - validates the model instance.
-- `validator()` - returns instance of `ValidatorInterface::class`.
-
-`FormModel::class` is the base class for all form models, defined methods are:
-
-- `getHint(string $attribute)` - returns the hint for the attribute.
-- `getHints()` - returns the hints for all attributes.
-- `getLabel(string $attribute)` - returns the label for the attribute.
-- `getLabels()` - returns the labels for all attributes.
-- `getPlaceholder(string $attribute)` - returns the placeholder for the attribute.
-- `getPlaceholders()` - returns the placeholders for all attributes.
-
+[FormModel::class](/docs/FormModel.md) is the base class for all form models, defined methods are:
 
 ### Unit testing
 
