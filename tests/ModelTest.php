@@ -152,19 +152,6 @@ final class ModelTest extends TestCase
         $this->assertSame([], $model->error()->getAll());
     }
 
-    public function testProtectedCollectAttributes(): void
-    {
-        $model = new class () extends AbstractModel {
-            protected int $int = 1;
-
-            public function collectAttributes(): array
-            {
-                return array_merge(parent::collectAttributes(), ['null' => 'null']);
-            }
-        };
-        $this->assertSame(['int' => 'int', 'null' => 'null'], $model->collectAttributes());
-    }
-
     public function testSetFormErrors(): void
     {
         $formErrors = new CustomFormErrors();
