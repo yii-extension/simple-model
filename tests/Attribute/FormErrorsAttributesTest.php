@@ -42,7 +42,6 @@ final class FormErrorsAttributesTest extends TestCase
         $this->assertFalse($formModel->validate());
         $this->assertSame($this->expected, FormErrorsAttributes::getAll($formModel));
         $formModel->error()->clear('login');
-        $this->assertEmpty(FormErrorsAttributes::getAll($formModel));
         $this->assertSame(['password' => ['Is too short.']], FormErrorsAttributes::getAll($formModel));
     }
 
