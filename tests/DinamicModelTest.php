@@ -45,7 +45,7 @@ final class DinamicModelTest extends TestCase
             $this->assertTrue($form->has($field['name']));
             $this->assertNull($form->getValue($field['name']));
 
-            $form->set($field['name'], $field['value']);
+            $form->setValue($field['name'], $field['value']);
             $this->assertSame($field['value'], $form->getValue($field['name']));
         }
     }

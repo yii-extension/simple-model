@@ -28,8 +28,8 @@ final class ModelTest extends TestCase
     public function testGetAttributeValue(): void
     {
         $model = new Model();
-        $model->set('login', 'admin');
-        $model->set('password', '123456');
+        $model->setValue('login', 'admin');
+        $model->setValue('password', '123456');
         $this->assertSame('admin', $model->getAttributeValue('login'));
         $this->assertSame('123456', $model->getAttributeValue('password'));
     }
@@ -125,8 +125,8 @@ final class ModelTest extends TestCase
     public function testSet(): void
     {
         $model = new Model();
-        $model->set('login', 'test');
-        $model->set('password', 'test');
+        $model->setValue('login', 'test');
+        $model->setValue('password', 'test');
         $this->assertSame('test', $model->getAttributeValue('login'));
         $this->assertSame('test', $model->getAttributeValue('password'));
     }
@@ -134,8 +134,8 @@ final class ModelTest extends TestCase
     public function testValidateInvalid(): void
     {
         $model = new Model();
-        $model->set('login', '@example.com');
-        $model->set('password', '7');
+        $model->setValue('login', '@example.com');
+        $model->setValue('password', '7');
         $this->assertFalse($model->validate());
         $this->assertSame(
             ['login' => ['This value is not a valid email address.'], 'password' => ['Is too short.']],
@@ -146,8 +146,8 @@ final class ModelTest extends TestCase
     public function testValidateValid(): void
     {
         $model = new Model();
-        $model->set('login', 'admin@example.com');
-        $model->set('password', 'Pol98767');
+        $model->setValue('login', 'admin@example.com');
+        $model->setValue('password', 'Pol98767');
         $this->assertTrue($model->validate());
         $this->assertSame([], $model->error()->getAll());
     }
@@ -186,8 +186,8 @@ final class ModelTest extends TestCase
         $validator = new Validator();
         $model = new Rules();
         $model->setValidator($validator);
-        $model->set('firstName', 'joe');
-        $model->set('lastName', 'doe');
+        $model->setValue('firstName', 'joe');
+        $model->setValue('lastName', 'doe');
         $this->assertTrue($model->validate());
         $this->assertSame([], $model->error()->getAll());
     }

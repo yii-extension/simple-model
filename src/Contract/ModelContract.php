@@ -95,7 +95,14 @@ interface ModelContract extends DataSetInterface, RulesProviderInterface
      * @param string $name of the attribute to set
      * @param mixed $value
      */
-    public function set(string $name, mixed $value): void;
+    public function setValue(string $name, mixed $value): void;
+
+    /**
+     * Set values for attributes.
+     *
+     * @param array $data the key-value pairs to set for the attributes.
+     */
+    public function setValues(array $data): void;
 
     /**
      * Set custom form errors instance.

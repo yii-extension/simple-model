@@ -121,13 +121,23 @@ abstract class Model implements ModelContract
         };
 
         foreach ($this->rawData as $name => $value) {
-            $this->set($name, $value);
+            $this->setValue($name, $value);
         }
 
         return $this->rawData !== [];
     }
 
-    public function set(string $name, mixed $value): void
+    public function setFormErrors(FormErrorsContract $formErrors): void
+    {
+        $this->formErrors = $formErrors;
+    }
+
+    public function setValidator(ValidatorInterface $validator): void
+    {
+        $this->validator = $validator;
+    }
+
+    public function setValue(string $name, mixed $value): void
     {
         [$realName] = $this->getNested($name);
 
@@ -145,17 +155,7 @@ abstract class Model implements ModelContract
         }
     }
 
-    public function setFormErrors(FormErrorsContract $formErrors): void
-    {
-        $this->formErrors = $formErrors;
-    }
-
-    public function setValidator(ValidatorInterface $validator): void
-    {
-        $this->validator = $validator;
-    }
-
-    public function sets(array $data): void
+    public function setValues(array $data): void
     {
         /**
          * @var array<string, mixed> $data
@@ -165,7 +165,7 @@ abstract class Model implements ModelContract
             $name = $this->getInflector()->toCamelCase($name);
 
             if ($this->has($name)) {
-                $this->set($name, $value);
+                $this->setValue($name, $value);
             } else {
                 throw new InvalidArgumentException(sprintf('Attribute "%s" does not exist', $name));
             }
@@ -306,7 +306,7 @@ abstract class Model implements ModelContract
         $setter = static function (ModelContract $class, string $attribute, mixed $value, ?string $nested): void {
             match ($nested) {
                 null => $class->$attribute = $value,
-                default => $class->$attribute->set($nested, $value),
+                default => $class->$attribute->setValue($nested, $value),
             };
         };
 

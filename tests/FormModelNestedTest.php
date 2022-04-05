@@ -13,7 +13,7 @@ final class FormModelNestedTest extends TestCase
     public function testGetAttributeValue(): void
     {
         $formModel = new Nested();
-        //$formModel->set('user.login', 'admin');
+        //$formModel->setValue('user.login', 'admin');
         $this->assertNull($formModel->getAttributeValue('user.login'));
     }
 

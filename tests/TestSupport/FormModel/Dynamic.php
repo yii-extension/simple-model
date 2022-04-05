@@ -28,7 +28,7 @@ final class Dynamic extends FormModel
         return null;
     }
 
-    public function set(string $name, $value): void
+    public function setValue(string $name, $value): void
     {
         if ($this->has($name)) {
             $this->attributes[$name] = $value;
