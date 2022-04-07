@@ -8,11 +8,7 @@ use Exception;
 use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionNamedType;
-use ReflectionUnionType;
-use Stringable;
 use Yii\Extension\Model\Contract\ModelContract;
-
-use function array_key_exists;
 
 final class ModelType
 {

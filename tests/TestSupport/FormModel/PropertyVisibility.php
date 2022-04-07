@@ -11,7 +11,7 @@ final class PropertyVisibility extends FormModel
     public string $public = '';
     protected string $protected = '';
     private string $private = '';
-    private static string $static  = '';
+    private static string $static = '';
 
     public function getName(): string
     {

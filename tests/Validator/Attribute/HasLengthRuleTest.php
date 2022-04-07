@@ -17,7 +17,7 @@ final class HasLengthRuleTest extends TestCase
         $this->assertSame(
             [
                 'hasLengthRule' => [
-                    'This value should contain at least {min, number} {min, plural, one{character} other{characters}}.'
+                    'This value should contain at least {min, number} {min, plural, one{character} other{characters}}.',
                 ],
             ],
             FormErrorsAttributes::getAll($formModel)
@@ -28,7 +28,7 @@ final class HasLengthRuleTest extends TestCase
         $this->assertSame(
             [
                 'hasLengthRule' => [
-                    'This value should contain at least {min, number} {min, plural, one{character} other{characters}}.'
+                    'This value should contain at least {min, number} {min, plural, one{character} other{characters}}.',
                 ],
             ],
             FormErrorsAttributes::getAll($formModel)
@@ -39,7 +39,7 @@ final class HasLengthRuleTest extends TestCase
         $this->assertSame(
             [
                 'hasLengthRule' => [
-                    'This value should contain at most {max, number} {max, plural, one{character} other{characters}}.'
+                    'This value should contain at most {max, number} {max, plural, one{character} other{characters}}.',
                 ],
             ],
             FormErrorsAttributes::getAll($formModel)

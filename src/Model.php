@@ -6,8 +6,6 @@ namespace Yii\Extension\Model;
 
 use Closure;
 use InvalidArgumentException;
-use ReflectionClass;
-use ReflectionNamedType;
 use Yii\Extension\Model\Contract\ModelContract;
 use Yii\Extension\Model\Contract\ModelErrorsContract;
 use Yiisoft\Strings\Inflector;
